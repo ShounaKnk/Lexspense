@@ -97,9 +97,6 @@ lib/
             ├── category_management_screen.dart
             └── settings_screen.dart
 ```
-
----
-
 ## 🧪 Running Unit Tests
 
 Run the included unit tests for currency precision and SQLite models:
