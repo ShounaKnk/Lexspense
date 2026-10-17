@@ -97,33 +97,6 @@ lib/
             ├── category_management_screen.dart
             └── settings_screen.dart
 ```
-
----
-
-## ⚡ Running & Testing on a Slow PC (i3 10th Gen / 12GB RAM)
-
-Android Studio emulators consume **4GB+ RAM** and heavy CPU cycles, which will slow down a dual-core/quad-core i3 U-series laptop. Here is how to test smoothly without lagging:
-
-### Option 1: Physical Android Phone via USB Debugging (Recommended)
-This runs the app at 100% native speed with zero load on your PC:
-1. Enable **Developer Options** on your Android phone (tap *Build Number* 7 times in Settings > About Phone).
-2. Enable **USB Debugging** inside Developer Options.
-3. Plug your phone into your PC with a USB cable.
-4. Run:
-   ```bash
-   flutter run -d <your-device-id>
-   ```
-Your PC only compiles the APK; the phone does all the rendering!
-
-### Option 2: Run directly on Windows Desktop
-If you just want to preview and iterate on the UI instantly without any phone or emulator:
-```bash
-flutter run -d windows
-```
-Desktop Flutter uses native Windows DirectX/ANGLE rendering, starting in seconds with very low RAM usage.
-
----
-
 ## 🧪 Running Unit Tests
 
 Run the included unit tests for currency precision and SQLite models:
