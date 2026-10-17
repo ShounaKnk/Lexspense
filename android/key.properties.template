@@ -1,0 +1,7 @@
+# Template for Android release signing configuration.
+# Copy this file to `key.properties` in this directory (android/key.properties) and populate with your keystore details.
+# DO NOT commit the actual `key.properties` or keystore files to source control.
+keyAlias=your_key_alias
+keyPassword=your_key_password
+storeFile=../keystores/release.keystore
+storePassword=your_keystore_password

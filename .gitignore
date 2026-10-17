@@ -50,6 +50,12 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 local.properties
+key.properties
+**/key.properties
+*.keystore
+*.jks
+**/*.keystore
+**/*.jks
 
 # Windows specific
 windows/flutter/ephemeral/

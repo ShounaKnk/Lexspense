@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import '../core/utils/constants.dart';
@@ -23,7 +24,8 @@ class ReceiptStorageService {
     final ext = p.extension(sourceImage.path).isNotEmpty
         ? p.extension(sourceImage.path)
         : '.jpg';
-    final fileName = 'rcpt_${DateTime.now().millisecondsSinceEpoch}_${sourceImage.hashCode}$ext';
+    final rand = Random.secure().nextInt(0xFFFFFF).toRadixString(16).padLeft(6, '0');
+    final fileName = 'rcpt_${DateTime.now().millisecondsSinceEpoch}_$rand$ext';
     final destinationPath = p.join(dir.path, fileName);
     
     await sourceImage.copy(destinationPath);
