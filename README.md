@@ -1,8 +1,8 @@
 # ⚖️ Lexspense
 
-**Privacy-First, 100% Offline Expense Tracker for Junior Advocates & Lawyers**
+**Privacy-First, 100% Offline Expense Tracker for Advocates & Lawyers**
 
-Lexspense is a purpose-built Flutter application designed specifically for junior litigators and legal associates to log court fees, printing, typing, notary charges, stamp paper, and travel errands on the fly, and cleanly settle batches with senior advocates with formal PDF vouchers.
+Lexspense is a purpose-built Flutter application designed specifically for Advocates and lawyers to log court fees, printing, typing, notary charges, stamp paper, and travel errands on the fly, and cleanly settle batches with senior advocates with formal PDF vouchers.
 
 ---
 
