@@ -1,4 +1,5 @@
 import 'dart:developer' as developer;
+import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 import '../core/utils/currency_utils.dart';
 import '../data/repositories/expense_repository.dart';
@@ -24,7 +25,9 @@ class WidgetSyncService {
       );
     } catch (e, st) {
       // Graceful fallback if widget provider is not registered or running on unsupported platforms
-      developer.log('WidgetSyncService error: $e', error: e, stackTrace: st);
+      if (kDebugMode) {
+        developer.log('WidgetSyncService error: $e', error: e, stackTrace: st);
+      }
     }
   }
 }
