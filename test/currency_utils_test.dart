@@ -23,5 +23,10 @@ void main() {
       final formatted = CurrencyUtils.format(1245000); // 12,450.00
       expect(formatted, contains('12,450.00'));
     });
+
+    test('formatForPdf produces Rs. prefixed formatted string', () {
+      final formatted = CurrencyUtils.formatForPdf(1245000);
+      expect(formatted, equals('Rs. 12,450.00'));
+    });
   });
 }

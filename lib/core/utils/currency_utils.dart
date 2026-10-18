@@ -35,4 +35,7 @@ class CurrencyUtils {
   /// Format without the ₹ symbol (for text fields, etc.)
   static String formatPlain(int paise) =>
       NumberFormat('#,##,##0.00', 'en_IN').format(paise / 100);
+
+  /// Format with "Rs." for PDF rendering where Helvetica lacks unicode ₹ symbol.
+  static String formatForPdf(int paise) => 'Rs. ${formatPlain(paise)}';
 }

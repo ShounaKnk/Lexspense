@@ -150,7 +150,7 @@ class PdfService {
                         _cell(exp.categoryName),
                         _cell(exp.expense.expenseDate),
                         _cell(
-                          CurrencyUtils.formatRupees(exp.expense.amountPaise),
+                          CurrencyUtils.formatForPdf(exp.expense.amountPaise),
                           align: pw.TextAlign.right,
                         ),
                       ],
@@ -165,7 +165,7 @@ class PdfService {
                       _cell(''),
                       _cell(''),
                       _cell(
-                        CurrencyUtils.formatRupees(reimbursement.totalAmountPaise),
+                        CurrencyUtils.formatForPdf(reimbursement.totalAmountPaise),
                         isHeader: true,
                         align: pw.TextAlign.right,
                       ),
@@ -271,7 +271,7 @@ class PdfService {
                       ),
                       pw.SizedBox(height: 4),
                       pw.Text(
-                        'Category: ${exp.categoryName}  |  Date: ${exp.expense.expenseDate}  |  Amount: ${CurrencyUtils.formatRupees(exp.expense.amountPaise)}',
+                        'Category: ${exp.categoryName}  |  Date: ${exp.expense.expenseDate}  |  Amount: ${CurrencyUtils.formatForPdf(exp.expense.amountPaise)}',
                         style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
                       ),
                       pw.SizedBox(height: 12),

@@ -100,37 +100,12 @@ class ExpenseListTile extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        Text(
-                          AppDateUtils.toDisplay(expense.expenseDate),
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant.withOpacity(0.8),
-                            fontSize: 11,
-                          ),
-                        ),
-                        if (expense.notes != null && expense.notes!.isNotEmpty) ...[
-                          Text(
-                            ' • ',
-                            style: TextStyle(
-                              color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
-                              fontSize: 10,
-                            ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              expense.notes!,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant.withOpacity(0.8),
-                                fontStyle: FontStyle.italic,
-                                fontSize: 11,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ],
+                    Text(
+                      AppDateUtils.toDisplay(expense.expenseDate),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant.withOpacity(0.8),
+                        fontSize: 11,
+                      ),
                     ),
                   ],
                 ),
