@@ -1,7 +1,5 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
-import 'package:sqflite/sqflite.dart';
 import '../models/expense.dart';
 import '../models/expense_view.dart';
 import '../models/receipt_image.dart';

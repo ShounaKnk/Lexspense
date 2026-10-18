@@ -150,15 +150,6 @@ class DashboardScreen extends ConsumerWidget {
             (sum, item) => sum + item.expense.amountPaise,
           );
 
-          final selectedExpenses = expenses
-              .where((e) => e.expense.id != null && selectedIds.contains(e.expense.id!))
-              .toList();
-
-          final selectedPaise = selectedExpenses.fold<int>(
-            0,
-            (sum, item) => sum + item.expense.amountPaise,
-          );
-
           return RefreshIndicator(
             onRefresh: () async {
               ref.invalidate(unpaidExpensesProvider);

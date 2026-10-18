@@ -26,7 +26,6 @@ class _ReimbursementDetailScreenState extends ConsumerState<ReimbursementDetailS
   bool _isGeneratingPdf = false;
   bool _isUndoing = false;
   Map<int, List<ReceiptImage>> _receiptsMap = {};
-  bool _isLoadingReceipts = true;
 
   @override
   void initState() {
@@ -48,12 +47,7 @@ class _ReimbursementDetailScreenState extends ConsumerState<ReimbursementDetailS
       if (mounted) {
         setState(() {
           _receiptsMap = map;
-          _isLoadingReceipts = false;
         });
-      }
-    } else {
-      if (mounted) {
-        setState(() => _isLoadingReceipts = false);
       }
     }
   }

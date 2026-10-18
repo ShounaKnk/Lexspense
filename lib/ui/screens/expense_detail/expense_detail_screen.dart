@@ -6,7 +6,6 @@ import '../../../core/utils/currency_utils.dart';
 import '../../../core/utils/date_utils.dart';
 import '../../../core/utils/icon_map.dart';
 import '../../../data/models/expense_view.dart';
-import '../../../data/models/receipt_image.dart';
 import '../../../providers/database_provider.dart';
 import '../../../providers/expense_provider.dart';
 import '../../../providers/reimbursement_provider.dart';
@@ -34,7 +33,7 @@ class ExpenseDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
-  Future<void> _deleteExpense(BuildContext context, ExpenseView view) async {
+  Future<void> _deleteExpense(ExpenseView view) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -58,29 +57,27 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
       ),
     );
 
-    if (confirm == true && mounted) {
-      try {
-        await ref.read(expenseRepositoryProvider).deleteExpense(view.expense.id!);
-        ref.read(selectedExpensesProvider.notifier).toggle(view.expense.id!);
-        ref.invalidate(unpaidExpensesProvider);
-        await ref.read(widgetSyncServiceProvider).updateWidgetData();
-        if (mounted) {
-          Navigator.of(context).pop(); // Exit detail screen
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Expense deleted successfully')),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error deleting expense: $e')),
-          );
-        }
-      }
+    if (confirm != true || !mounted) return;
+
+    try {
+      await ref.read(expenseRepositoryProvider).deleteExpense(view.expense.id!);
+      ref.read(selectedExpensesProvider.notifier).toggle(view.expense.id!);
+      ref.invalidate(unpaidExpensesProvider);
+      await ref.read(widgetSyncServiceProvider).updateWidgetData();
+      if (!mounted) return;
+      Navigator.of(context).pop(); // Exit detail screen
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Expense deleted successfully')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting expense: $e')),
+      );
     }
   }
 
-  void _showMarkPaidModal(BuildContext context, ExpenseView view) {
+  void _showMarkPaidModal(ExpenseView view) {
     showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
@@ -101,12 +98,11 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
           ref.invalidate(reimbursementsListProvider);
           ref.invalidate(singleExpenseProvider(widget.expenseId));
           await ref.read(widgetSyncServiceProvider).updateWidgetData();
-          if (mounted) {
-            Navigator.of(context).pop(); // close modal
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Expense marked as reimbursed')),
-            );
-          }
+          if (!mounted) return;
+          Navigator.of(context).pop(); // close modal
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Expense marked as reimbursed')),
+          );
         },
       ),
     );
@@ -204,7 +200,7 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
               icon: const Icon(Icons.delete_outline),
               tooltip: 'Delete Expense',
               color: theme.colorScheme.error,
-              onPressed: () => _deleteExpense(context, expenseView),
+              onPressed: () => _deleteExpense(expenseView),
             ),
         ],
       ),
@@ -713,7 +709,7 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
                             borderRadius: BorderRadius.circular(14),
                           ),
                         ),
-                        onPressed: () => _deleteExpense(context, expenseView),
+                        onPressed: () => _deleteExpense(expenseView),
                         icon: const Icon(Icons.delete_outline, size: 20),
                         label: const Text('Delete'),
                       ),
@@ -728,7 +724,7 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
                             borderRadius: BorderRadius.circular(14),
                           ),
                         ),
-                        onPressed: () => _showMarkPaidModal(context, expenseView),
+                        onPressed: () => _showMarkPaidModal(expenseView),
                         icon: const Icon(Icons.check_circle_outline, size: 20),
                         label: const Text('Claim This Expense'),
                       ),
