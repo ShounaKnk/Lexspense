@@ -11,6 +11,7 @@ import '../../../providers/database_provider.dart';
 import '../../../providers/expense_provider.dart';
 import '../../../providers/reimbursement_provider.dart';
 import '../../../providers/settings_provider.dart';
+import '../../widgets/category_icon_badge.dart';
 import '../expense_detail/expense_detail_screen.dart';
 
 class ReimbursementDetailScreen extends ConsumerStatefulWidget {
@@ -154,7 +155,7 @@ class _ReimbursementDetailScreenState extends ConsumerState<ReimbursementDetailS
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: const Icon(Icons.close_rounded),
                     onPressed: () => Navigator.of(ctx).pop(),
                   ),
                 ],
@@ -191,12 +192,12 @@ class _ReimbursementDetailScreenState extends ConsumerState<ReimbursementDetailS
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Icon(Icons.share_outlined),
+                : const Icon(Icons.share_rounded),
             tooltip: 'Export & Share PDF Voucher',
             onPressed: _isGeneratingPdf ? null : _exportPdf,
           ),
           IconButton(
-            icon: const Icon(Icons.undo_outlined),
+            icon: const Icon(Icons.undo_rounded),
             tooltip: 'Undo Reimbursement',
             onPressed: _isUndoing ? null : _undoReimbursement,
           ),
@@ -271,7 +272,7 @@ class _ReimbursementDetailScreenState extends ConsumerState<ReimbursementDetailS
                         const SizedBox(height: 8),
                         Row(
                           children: [
-                            const Icon(Icons.note_outlined, size: 16, color: AppColors.paidBadge),
+                            const Icon(Icons.notes_rounded, size: 16, color: AppColors.paidBadge),
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
@@ -290,7 +291,7 @@ class _ReimbursementDetailScreenState extends ConsumerState<ReimbursementDetailS
                 // Export Button Card
                 FilledButton.icon(
                   onPressed: _isGeneratingPdf ? null : _exportPdf,
-                  icon: const Icon(Icons.picture_as_pdf_outlined),
+                  icon: const Icon(Icons.picture_as_pdf_rounded),
                   label: Text(_isGeneratingPdf ? 'Generating PDF...' : 'Share Formal PDF Voucher'),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
@@ -312,7 +313,6 @@ class _ReimbursementDetailScreenState extends ConsumerState<ReimbursementDetailS
                   separatorBuilder: (_, __) => const SizedBox(height: 10),
                   itemBuilder: (context, index) {
                     final item = expenses[index];
-                    final iconData = IconMap.fromKey(item.categoryIcon);
                     final receipts = _receiptsMap[item.expense.id] ?? [];
 
                     return Card(
@@ -337,13 +337,11 @@ class _ReimbursementDetailScreenState extends ConsumerState<ReimbursementDetailS
                             children: [
                               Row(
                                 children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: theme.colorScheme.primary.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Icon(iconData, color: theme.colorScheme.primary, size: 20),
+                                  CategoryIconBadge(
+                                    iconKey: item.categoryIcon,
+                                    size: 40,
+                                    iconSize: 20,
+                                    borderRadius: 10,
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(

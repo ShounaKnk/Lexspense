@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/icon_map.dart';
+import '../../widgets/category_icon_badge.dart';
 import '../../../data/models/expense_category.dart';
 import '../../../providers/category_provider.dart';
 import '../../../providers/database_provider.dart';
@@ -43,25 +44,26 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
                 runSpacing: 10,
                 children: IconMap.availableKeys.map((iconKey) {
                   final isSelected = iconKey == selectedIcon;
+                  final isDark = Theme.of(context).brightness == Brightness.dark;
+                  final iconColor = IconMap.colorFor(iconKey, isDark: isDark);
+                  final iconBg = IconMap.backgroundFor(iconKey, isDark: isDark);
+
                   return InkWell(
                     onTap: () => setDialogState(() => selectedIcon = iconKey),
                     borderRadius: BorderRadius.circular(10),
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: isSelected
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+                        color: isSelected ? iconColor : iconBg,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: isSelected
-                              ? Theme.of(context).colorScheme.primary
-                              : Colors.transparent,
+                          color: isSelected ? iconColor : Colors.transparent,
+                          width: 1.5,
                         ),
                       ),
                       child: Icon(
                         IconMap.fromKey(iconKey),
-                        color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
+                        color: isSelected ? Colors.white : iconColor,
                         size: 22,
                       ),
                     ),
@@ -134,7 +136,6 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
             separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
               final cat = categories[index];
-              final iconData = IconMap.fromKey(cat.icon);
 
               return Card(
                 elevation: 0.5,
@@ -143,17 +144,13 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
                   side: BorderSide(color: theme.dividerColor.withOpacity(0.1)),
                 ),
                 child: SwitchListTile(
-                  secondary: CircleAvatar(
-                    backgroundColor: cat.isActive
-                        ? theme.colorScheme.primary.withOpacity(0.12)
-                        : theme.dividerColor,
-                    child: Icon(
-                      iconData,
-                      color: cat.isActive
-                          ? theme.colorScheme.primary
-                          : theme.colorScheme.onSurfaceVariant,
-                      size: 20,
-                    ),
+                  secondary: CategoryIconBadge(
+                    iconKey: cat.icon,
+                    size: 40,
+                    iconSize: 20,
+                    borderRadius: 10,
+                    customColor: !cat.isActive ? theme.colorScheme.onSurfaceVariant.withOpacity(0.5) : null,
+                    customBgColor: !cat.isActive ? theme.dividerColor.withOpacity(0.15) : null,
                   ),
                   title: Text(
                     cat.name,
@@ -179,7 +176,7 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddCategoryDialog,
-        icon: const Icon(Icons.add),
+        icon: const Icon(Icons.add_rounded),
         label: const Text('New Category'),
       ),
     );

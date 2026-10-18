@@ -130,7 +130,7 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: const Icon(Icons.close_rounded),
                     onPressed: () => Navigator.of(ctx).pop(),
                   ),
                 ],
@@ -173,7 +173,7 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.error_outline, size: 48, color: theme.colorScheme.error),
+              Icon(Icons.error_outline_rounded, size: 48, color: theme.colorScheme.error),
               const SizedBox(height: 12),
               const Text('Expense record not found'),
               const SizedBox(height: 16),
@@ -197,7 +197,7 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
         actions: [
           if (!isReimbursed)
             IconButton(
-              icon: const Icon(Icons.delete_outline),
+              icon: const Icon(Icons.delete_outline_rounded),
               tooltip: 'Delete Expense',
               color: theme.colorScheme.error,
               onPressed: () => _deleteExpense(expenseView),
@@ -237,12 +237,13 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // Category pill
+                    // Category pill
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
                         color: isReimbursed
                             ? Colors.white.withOpacity(0.18)
-                            : theme.colorScheme.primary.withOpacity(0.12),
+                            : IconMap.backgroundFor(expenseView.categoryIcon),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Row(
@@ -251,13 +252,17 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
                           Icon(
                             iconData,
                             size: 16,
-                            color: isReimbursed ? Colors.white : theme.colorScheme.primary,
+                            color: isReimbursed
+                                ? Colors.white
+                                : IconMap.colorFor(expenseView.categoryIcon),
                           ),
                           const SizedBox(width: 6),
                           Text(
                             expenseView.categoryName,
                             style: TextStyle(
-                              color: isReimbursed ? Colors.white : theme.colorScheme.primary,
+                              color: isReimbursed
+                                  ? Colors.white
+                                  : IconMap.colorFor(expenseView.categoryIcon),
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
                             ),
@@ -279,7 +284,7 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            isReimbursed ? Icons.check_circle : Icons.pending_outlined,
+                            isReimbursed ? Icons.check_circle_rounded : Icons.pending_rounded,
                             size: 13,
                             color: Colors.white,
                           ),
@@ -335,14 +340,14 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
               child: Column(
                 children: [
                   _DetailRow(
-                    icon: Icons.business_center_outlined,
+                    icon: Icons.business_center_rounded,
                     label: 'Client Matter / Case',
                     value: expenseView.matterTitle,
                     isBold: true,
                   ),
                   Divider(height: 20, color: theme.dividerColor.withOpacity(0.08)),
                   _DetailRow(
-                    icon: Icons.account_balance_outlined,
+                    icon: Icons.account_balance_rounded,
                     label: 'Court / Forum',
                     value: (expenseView.forumName != null && expenseView.forumName!.isNotEmpty)
                         ? expenseView.forumName!
@@ -350,14 +355,14 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
                   ),
                   Divider(height: 20, color: theme.dividerColor.withOpacity(0.08)),
                   _DetailRow(
-                    icon: Icons.calendar_today_outlined,
+                    icon: Icons.calendar_today_rounded,
                     label: 'Expense Date',
                     value: AppDateUtils.toDisplay(expense.expenseDate),
                   ),
                   if (expense.createdAt != null) ...[
                     Divider(height: 20, color: theme.dividerColor.withOpacity(0.08)),
                     _DetailRow(
-                      icon: Icons.schedule_outlined,
+                      icon: Icons.schedule_rounded,
                       label: 'Logged Timestamp',
                       value: expense.createdAt!,
                     ),
@@ -533,7 +538,7 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.photo_library_outlined,
+                          Icon(Icons.photo_library_rounded,
                               size: 20, color: theme.colorScheme.primary),
                           const SizedBox(width: 8),
                           Text(
@@ -592,7 +597,7 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
                           child: Column(
                             children: [
                               Icon(
-                                Icons.receipt_long_outlined,
+                                Icons.receipt_long_rounded,
                                 size: 36,
                                 color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
                               ),
@@ -662,7 +667,7 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
                                           shape: BoxShape.circle,
                                         ),
                                         child: const Icon(
-                                          Icons.fullscreen,
+                                          Icons.fullscreen_rounded,
                                           color: Colors.white,
                                           size: 16,
                                         ),
@@ -710,7 +715,7 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
                           ),
                         ),
                         onPressed: () => _deleteExpense(expenseView),
-                        icon: const Icon(Icons.delete_outline, size: 20),
+                        icon: const Icon(Icons.delete_outline_rounded, size: 20),
                         label: const Text('Delete'),
                       ),
                     ),
@@ -725,7 +730,7 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
                           ),
                         ),
                         onPressed: () => _showMarkPaidModal(expenseView),
-                        icon: const Icon(Icons.check_circle_outline, size: 20),
+                        icon: const Icon(Icons.check_circle_rounded, size: 20),
                         label: const Text('Claim This Expense'),
                       ),
                     ),

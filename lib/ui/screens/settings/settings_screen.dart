@@ -88,10 +88,14 @@ class SettingsScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      CircleAvatar(
-                        radius: 28,
-                        backgroundColor: theme.colorScheme.primary.withOpacity(0.12),
-                        child: Icon(Icons.person, color: theme.colorScheme.primary, size: 30),
+                      Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(Icons.person_rounded, color: theme.colorScheme.primary, size: 28),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -124,7 +128,7 @@ class SettingsScreen extends ConsumerWidget {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.edit_outlined),
+                        icon: const Icon(Icons.edit_rounded),
                         tooltip: 'Edit Profile',
                         onPressed: () => _editProfile(context, ref, profile),
                       ),
@@ -156,10 +160,22 @@ class SettingsScreen extends ConsumerWidget {
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.business_center_outlined),
+                  leading: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.business_center_rounded,
+                      color: theme.colorScheme.primary,
+                      size: 20,
+                    ),
+                  ),
                   title: const Text('Client Matters & Cases'),
                   subtitle: const Text('Manage case titles and forums'),
-                  trailing: const Icon(Icons.chevron_right),
+                  trailing: const Icon(Icons.chevron_right_rounded),
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => const MattersScreen()),
@@ -168,10 +184,22 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 Divider(height: 1, indent: 56, color: theme.dividerColor.withOpacity(0.1)),
                 ListTile(
-                  leading: const Icon(Icons.account_balance_outlined),
+                  leading: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF00897B).withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.account_balance_rounded,
+                      color: Color(0xFF00897B),
+                      size: 20,
+                    ),
+                  ),
                   title: const Text('Courts & Forums'),
                   subtitle: const Text('Manage courts, tribunals, and forums'),
-                  trailing: const Icon(Icons.chevron_right),
+                  trailing: const Icon(Icons.chevron_right_rounded),
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => const ForumsScreen()),
@@ -180,10 +208,22 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 Divider(height: 1, indent: 56, color: theme.dividerColor.withOpacity(0.1)),
                 ListTile(
-                  leading: const Icon(Icons.category_outlined),
+                  leading: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF8E24AA).withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.category_rounded,
+                      color: Color(0xFF8E24AA),
+                      size: 20,
+                    ),
+                  ),
                   title: const Text('Expense Categories'),
                   subtitle: const Text('Customize categories and icons'),
-                  trailing: const Icon(Icons.chevron_right),
+                  trailing: const Icon(Icons.chevron_right_rounded),
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => const CategoryManagementScreen()),

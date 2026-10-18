@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/date_utils.dart';
 
@@ -99,12 +100,13 @@ class _MarkPaidBottomSheetState extends State<MarkPaidBottomSheet> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.12),
-                  shape: BoxShape.circle,
+                  color: AppColors.paidBadge.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(Icons.check_circle_outline, color: theme.colorScheme.primary),
+                child: const Icon(Icons.check_circle_rounded, color: AppColors.paidBadge, size: 22),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -165,7 +167,7 @@ class _MarkPaidBottomSheetState extends State<MarkPaidBottomSheet> {
             contentPadding: EdgeInsets.zero,
             title: const Text('Settlement Date'),
             subtitle: Text(AppDateUtils.toDisplay(AppDateUtils.toDbString(_selectedDate))),
-            trailing: const Icon(Icons.calendar_today_outlined),
+            trailing: const Icon(Icons.calendar_today_rounded),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(color: theme.dividerColor.withOpacity(0.3)),

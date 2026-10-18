@@ -25,7 +25,7 @@ class MatterPicker extends StatelessWidget {
           decoration: InputDecoration(
             labelText: 'Client Matter / Case',
             hintText: 'Select case',
-            prefixIcon: const Icon(Icons.business_center_outlined),
+            prefixIcon: Icon(Icons.business_center_rounded, color: Theme.of(context).colorScheme.primary),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           ),
@@ -47,7 +47,7 @@ class MatterPicker extends StatelessWidget {
           alignment: Alignment.centerRight,
           child: TextButton.icon(
             onPressed: onQuickAddMatter,
-            icon: const Icon(Icons.add, size: 16),
+            icon: const Icon(Icons.add_rounded, size: 16),
             label: const Text('Add New Matter', style: TextStyle(fontSize: 13)),
             style: TextButton.styleFrom(
               visualDensity: VisualDensity.compact,

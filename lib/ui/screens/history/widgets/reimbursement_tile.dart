@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/date_utils.dart';
-import '../../../../core/utils/icon_map.dart';
+import '../../../widgets/category_icon_badge.dart';
 import '../../../../data/models/reimbursement.dart';
 
 class ReimbursementTile extends StatelessWidget {
@@ -20,10 +20,6 @@ class ReimbursementTile extends StatelessWidget {
     final theme = Theme.of(context);
     final isSingleExpense = reimbursement.itemCount == 1;
 
-    final IconData iconData = isSingleExpense
-        ? IconMap.fromKey(reimbursement.singleCategoryIcon)
-        : Icons.receipt_long_rounded;
-
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       elevation: 0.5,
@@ -39,20 +35,29 @@ class ReimbursementTile extends StatelessWidget {
           child: Row(
             children: [
               // Icon container
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: (isSingleExpense ? theme.colorScheme.primary : AppColors.paidBadge)
-                      .withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(14),
+              if (isSingleExpense)
+                CategoryIconBadge(
+                  iconKey: reimbursement.singleCategoryIcon,
+                  size: 44,
+                  iconSize: 22,
+                  borderRadius: 12,
+                )
+              else
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: AppColors.paidBadge.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.receipt_long_rounded,
+                      color: AppColors.paidBadge,
+                      size: 22,
+                    ),
+                  ),
                 ),
-                child: Icon(
-                  iconData,
-                  color: isSingleExpense ? theme.colorScheme.primary : AppColors.paidBadge,
-                  size: 24,
-                ),
-              ),
               const SizedBox(width: 14),
 
               // Title and details
@@ -175,7 +180,7 @@ class ReimbursementTile extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Icon(Icons.chevron_right, size: 20, color: Colors.grey),
+                  const Icon(Icons.chevron_right_rounded, size: 20, color: Colors.grey),
                 ],
               ),
             ],

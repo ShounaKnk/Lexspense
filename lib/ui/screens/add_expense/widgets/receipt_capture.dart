@@ -48,7 +48,7 @@ class ReceiptCapture extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.camera_alt_outlined),
+                leading: const Icon(Icons.camera_alt_rounded),
                 title: const Text('Capture with Camera'),
                 onTap: () {
                   Navigator.of(ctx).pop();
@@ -56,7 +56,7 @@ class ReceiptCapture extends StatelessWidget {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.photo_library_outlined),
+                leading: const Icon(Icons.photo_library_rounded),
                 title: const Text('Choose from Gallery'),
                 onTap: () {
                   Navigator.of(ctx).pop();
@@ -86,7 +86,7 @@ class ReceiptCapture extends StatelessWidget {
             ),
             TextButton.icon(
               onPressed: () => _showSourceSheet(context),
-              icon: const Icon(Icons.add_a_photo_outlined, size: 18),
+              icon: const Icon(Icons.add_a_photo_rounded, size: 18),
               label: const Text('Attach Photo'),
               style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
             ),
@@ -110,7 +110,7 @@ class ReceiptCapture extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.receipt_long_outlined, color: theme.colorScheme.primary),
+                    Icon(Icons.receipt_long_rounded, color: theme.colorScheme.primary),
                     const SizedBox(width: 8),
                     Text(
                       'Tap to attach receipt or cash memo',
@@ -154,7 +154,7 @@ class ReceiptCapture extends StatelessWidget {
                             color: Colors.black54,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.close, color: Colors.white, size: 14),
+                          child: const Icon(Icons.close_rounded, color: Colors.white, size: 14),
                         ),
                       ),
                     ),

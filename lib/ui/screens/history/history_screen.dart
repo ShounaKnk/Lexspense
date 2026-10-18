@@ -23,7 +23,7 @@ class HistoryScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.error_outline, size: 48, color: theme.colorScheme.error),
+              Icon(Icons.error_outline_rounded, size: 48, color: theme.colorScheme.error),
               const SizedBox(height: 12),
               Text('Error loading history: $e'),
               const SizedBox(height: 12),

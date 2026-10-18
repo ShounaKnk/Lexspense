@@ -32,25 +32,29 @@ class CategoryPicker extends StatelessWidget {
         final isSelected = cat.id == selectedCategoryId;
         final iconData = IconMap.fromKey(cat.icon);
 
+        final isDark = theme.brightness == Brightness.dark;
+        final catColor = IconMap.colorFor(cat.icon, isDark: isDark);
+        final catBg = IconMap.backgroundFor(cat.icon, isDark: isDark);
+
         return FilterChip(
           selected: isSelected,
           avatar: Icon(
             iconData,
             size: 18,
-            color: isSelected ? Colors.white : theme.colorScheme.primary,
+            color: isSelected ? Colors.white : catColor,
           ),
           label: Text(cat.name),
           labelStyle: TextStyle(
             color: isSelected ? Colors.white : theme.colorScheme.onSurface,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
           ),
-          backgroundColor: theme.colorScheme.surfaceVariant.withOpacity(0.3),
-          selectedColor: theme.colorScheme.primary,
+          backgroundColor: catBg,
+          selectedColor: catColor,
           checkmarkColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(
-              color: isSelected ? theme.colorScheme.primary : theme.dividerColor.withOpacity(0.15),
+              color: isSelected ? catColor : catColor.withOpacity(0.3),
             ),
           ),
           onSelected: (_) {

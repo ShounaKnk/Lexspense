@@ -113,7 +113,7 @@ class DashboardScreen extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add_circle_outline, size: 26),
+            icon: const Icon(Icons.add_circle_outline_rounded, size: 26),
             tooltip: 'Add Expense',
             onPressed: () {
               Navigator.of(context).push(
@@ -132,7 +132,7 @@ class DashboardScreen extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error_outline, size: 48, color: theme.colorScheme.error),
+                Icon(Icons.error_outline_rounded, size: 48, color: theme.colorScheme.error),
                 const SizedBox(height: 12),
                 Text('Error loading expenses: $err', textAlign: TextAlign.center),
                 const SizedBox(height: 16),
@@ -196,7 +196,7 @@ class DashboardScreen extends ConsumerWidget {
                             title: 'Courts / Forums',
                             subtitle: 'Manage Forums',
                             icon: Icons.account_balance_rounded,
-                            color: const Color(0xFF1565C0),
+                            color: const Color(0xFF00897B),
                             onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(builder: (_) => const ForumsScreen()),
@@ -249,7 +249,7 @@ class DashboardScreen extends ConsumerWidget {
                                   MaterialPageRoute(builder: (_) => const AddExpenseScreen()),
                                 );
                               },
-                              icon: const Icon(Icons.add),
+                              icon: const Icon(Icons.add_rounded),
                               label: const Text('Log New Expense'),
                             ),
                           ],
@@ -303,7 +303,7 @@ class DashboardScreen extends ConsumerWidget {
 
                 return FloatingActionButton.extended(
                   onPressed: () => _showMarkPaidModal(context, ref, selectedExpenses),
-                  icon: const Icon(Icons.check_circle),
+                  icon: const Icon(Icons.check_circle_rounded),
                   label: Text(
                     'Claim ${CurrencyUtils.format(selectedPaise)} (${selectedIds.length})',
                     style: const TextStyle(fontWeight: FontWeight.bold),
@@ -320,7 +320,7 @@ class DashboardScreen extends ConsumerWidget {
                   MaterialPageRoute(builder: (_) => const AddExpenseScreen()),
                 );
               },
-              icon: const Icon(Icons.add),
+              icon: const Icon(Icons.add_rounded),
               label: const Text('Add Expense'),
             ),
     );
@@ -395,7 +395,7 @@ class _QuickNavCard extends StatelessWidget {
                 ),
               ),
               Icon(
-                Icons.chevron_right,
+                Icons.chevron_right_rounded,
                 size: 16,
                 color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
               ),

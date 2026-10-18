@@ -54,11 +54,11 @@ class SummaryHeader extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
-                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.18),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
-                      Icons.account_balance_wallet_outlined,
+                      Icons.account_balance_wallet_rounded,
                       color: Colors.white,
                       size: 18,
                     ),

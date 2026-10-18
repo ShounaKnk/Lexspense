@@ -91,7 +91,7 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
                 decoration: const InputDecoration(
                   labelText: 'Court / Forum (Optional)',
                   hintText: 'Select forum',
-                  prefixIcon: Icon(Icons.account_balance_outlined),
+                  prefixIcon: Icon(Icons.account_balance_rounded, color: Color(0xFF00897B)),
                 ),
                 isExpanded: true,
                 items: [
@@ -322,14 +322,14 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.calendar_today_outlined, size: 20),
+                      const Icon(Icons.calendar_today_rounded, size: 20),
                       const SizedBox(width: 12),
                       Text(
                         AppDateUtils.toDisplay(AppDateUtils.toDbString(_selectedDate)),
                         style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
                       ),
                       const Spacer(),
-                      const Icon(Icons.arrow_drop_down),
+                      const Icon(Icons.arrow_drop_down_rounded),
                     ],
                   ),
                 ),

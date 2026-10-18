@@ -46,7 +46,7 @@ class _MattersScreenState extends ConsumerState<MattersScreen> {
                 decoration: const InputDecoration(
                   labelText: 'Court / Forum (Optional)',
                   hintText: 'Select forum',
-                  prefixIcon: Icon(Icons.account_balance_outlined),
+                  prefixIcon: Icon(Icons.account_balance_rounded, color: Color(0xFF00897B)),
                 ),
                 isExpanded: true,
                 items: [
@@ -245,12 +245,17 @@ class _MattersScreenState extends ConsumerState<MattersScreen> {
                         side: BorderSide(color: theme.dividerColor.withOpacity(0.1)),
                       ),
                       child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: isArchived
-                              ? theme.dividerColor
-                              : theme.colorScheme.primary.withOpacity(0.12),
+                        leading: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: isArchived
+                                ? theme.dividerColor.withOpacity(0.15)
+                                : theme.colorScheme.primary.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                           child: Icon(
-                            Icons.gavel_rounded,
+                            Icons.business_center_rounded,
                             color: isArchived
                                 ? theme.colorScheme.onSurfaceVariant
                                 : theme.colorScheme.primary,
@@ -286,7 +291,7 @@ class _MattersScreenState extends ConsumerState<MattersScreen> {
                               value: 'edit',
                               child: Row(
                                 children: [
-                                  Icon(Icons.edit_outlined, size: 18),
+                                  Icon(Icons.edit_rounded, size: 18),
                                   SizedBox(width: 8),
                                   Text('Edit'),
                                 ],
@@ -297,7 +302,7 @@ class _MattersScreenState extends ConsumerState<MattersScreen> {
                               child: Row(
                                 children: [
                                   Icon(
-                                    isArchived ? Icons.unarchive_outlined : Icons.archive_outlined,
+                                    isArchived ? Icons.unarchive_rounded : Icons.archive_rounded,
                                     size: 18,
                                   ),
                                   SizedBox(width: 8),
@@ -309,7 +314,7 @@ class _MattersScreenState extends ConsumerState<MattersScreen> {
                               value: 'delete',
                               child: Row(
                                 children: [
-                                  Icon(Icons.delete_outline, size: 18, color: Colors.red),
+                                  Icon(Icons.delete_outline_rounded, size: 18, color: Colors.red),
                                   SizedBox(width: 8),
                                   Text('Delete', style: TextStyle(color: Colors.red)),
                                 ],
@@ -328,7 +333,7 @@ class _MattersScreenState extends ConsumerState<MattersScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showMatterDialog(),
-        icon: const Icon(Icons.add),
+        icon: const Icon(Icons.add_rounded),
         label: const Text('Add Matter'),
       ),
     );

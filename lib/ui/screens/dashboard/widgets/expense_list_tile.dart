@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/date_utils.dart';
-import '../../../../core/utils/icon_map.dart';
+import '../../../widgets/category_icon_badge.dart';
 import '../../../../data/models/expense_view.dart';
 
 class ExpenseListTile extends StatelessWidget {
@@ -24,7 +24,6 @@ class ExpenseListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final expense = expenseView.expense;
-    final iconData = IconMap.fromKey(expenseView.categoryIcon);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
@@ -59,19 +58,12 @@ class ExpenseListTile extends StatelessWidget {
               ),
               const SizedBox(width: 4),
 
-              // Category Icon
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  iconData,
-                  color: theme.colorScheme.primary,
-                  size: 22,
-                ),
+              // Category Icon Badge
+              CategoryIconBadge(
+                iconKey: expenseView.categoryIcon,
+                size: 44,
+                iconSize: 22,
+                borderRadius: 12,
               ),
               const SizedBox(width: 14),
 
@@ -125,7 +117,7 @@ class ExpenseListTile extends StatelessWidget {
                   ),
                   if (onDelete != null)
                     IconButton(
-                      icon: const Icon(Icons.delete_outline, size: 18),
+                      icon: const Icon(Icons.delete_outline_rounded, size: 18),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                       color: theme.colorScheme.error.withOpacity(0.7),
