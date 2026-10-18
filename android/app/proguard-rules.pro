@@ -22,3 +22,6 @@
 
 # Keep line numbers for split debug info and symbolication
 -keepattributes SourceFile,LineNumberTable
+
+# Suppress Play Store deferred component / split install warnings referenced by Flutter engine
+-dontwarn com.google.android.play.core.**
