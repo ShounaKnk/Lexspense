@@ -26,7 +26,7 @@ Before generating your first PDF voucher, set up your counsel profile:
 1. Tap the **Settings** icon on the bottom navigation bar.
 2. In the **Advocate / Chamber Profile** section, tap the **Edit** icon.
 3. Enter your details:
-   - **Advocate / Counsel Name** (e.g., *Adv. Rajesh Sharma*)
+   - **Advocate / Counsel Name** (e.g., *Adv. Rajesh/Rani Sharma*)
    - **Chamber / Law Firm Name** (e.g., *Apex Chambers & Associates*)
    - **Designation** (e.g., *Senior Associate / Junior Counsel*)
    - **Phone / Email** (used for contact details in vouchers)
