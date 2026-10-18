@@ -9,6 +9,7 @@ import '../../../providers/selection_provider.dart';
 import '../add_expense/add_expense_screen.dart';
 import '../matters/matters_screen.dart';
 import '../forums/forums_screen.dart';
+import '../expense_detail/expense_detail_screen.dart';
 import 'widgets/expense_list_tile.dart';
 import 'widgets/mark_paid_bottom_sheet.dart';
 import 'widgets/summary_header.dart';
@@ -279,7 +280,13 @@ class DashboardScreen extends ConsumerWidget {
                             expenseView: item,
                             isSelected: isSelected,
                             onSelected: (_) => selectionNotifier.toggle(id),
-                            onTap: () => selectionNotifier.toggle(id),
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => ExpenseDetailScreen.fromView(item),
+                                ),
+                              );
+                            },
                             onDelete: () => _deleteExpense(context, ref, item),
                           );
                         },

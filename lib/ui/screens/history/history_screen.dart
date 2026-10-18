@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../providers/reimbursement_provider.dart';
+import '../expense_detail/expense_detail_screen.dart';
 import 'reimbursement_detail_screen.dart';
 import 'widgets/reimbursement_tile.dart';
 
@@ -82,11 +83,21 @@ class HistoryScreen extends ConsumerWidget {
                 return ReimbursementTile(
                   reimbursement: batch,
                   onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => ReimbursementDetailScreen(reimbursement: batch),
-                      ),
-                    );
+                    if (batch.itemCount == 1 && batch.singleExpenseId != null) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ExpenseDetailScreen(
+                            expenseId: batch.singleExpenseId!,
+                          ),
+                        ),
+                      );
+                    } else {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ReimbursementDetailScreen(reimbursement: batch),
+                        ),
+                      );
+                    }
                   },
                 );
               },

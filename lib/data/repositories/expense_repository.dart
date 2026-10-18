@@ -25,10 +25,12 @@ class ExpenseRepository {
     final rows = await db.rawQuery('''
       SELECT e.*, 
              m.case_title, 
+             cf.name AS forum_name,
              c.name AS category_name, 
              c.icon AS category_icon
       FROM expenses e
       JOIN client_matters m ON e.matter_id = m.id
+      LEFT JOIN court_forums cf ON m.forum_id = cf.id
       JOIN expense_categories c ON e.category_id = c.id
       WHERE e.reimbursement_id IS NULL
       ORDER BY e.expense_date DESC, e.created_at DESC
@@ -42,15 +44,42 @@ class ExpenseRepository {
     final rows = await db.rawQuery('''
       SELECT e.*, 
              m.case_title, 
+             cf.name AS forum_name,
              c.name AS category_name, 
-             c.icon AS category_icon
+             c.icon AS category_icon,
+             r.date_paid AS reimbursement_date_paid,
+             r.notes AS reimbursement_notes
       FROM expenses e
       JOIN client_matters m ON e.matter_id = m.id
+      LEFT JOIN court_forums cf ON m.forum_id = cf.id
       JOIN expense_categories c ON e.category_id = c.id
+      LEFT JOIN reimbursements r ON e.reimbursement_id = r.id
       WHERE e.reimbursement_id = ?
       ORDER BY e.expense_date ASC
     ''', [reimbursementId]);
     return rows.map(ExpenseView.fromMap).toList();
+  }
+
+  /// Single expense view by ID with all joined details.
+  Future<ExpenseView?> getExpenseById(int id) async {
+    final db = await _helper.database;
+    final rows = await db.rawQuery('''
+      SELECT e.*, 
+             m.case_title, 
+             cf.name AS forum_name,
+             c.name AS category_name, 
+             c.icon AS category_icon,
+             r.date_paid AS reimbursement_date_paid,
+             r.notes AS reimbursement_notes
+      FROM expenses e
+      JOIN client_matters m ON e.matter_id = m.id
+      LEFT JOIN court_forums cf ON m.forum_id = cf.id
+      JOIN expense_categories c ON e.category_id = c.id
+      LEFT JOIN reimbursements r ON e.reimbursement_id = r.id
+      WHERE e.id = ?
+    ''', [id]);
+    if (rows.isEmpty) return null;
+    return ExpenseView.fromMap(rows.first);
   }
 
   /// Summary for the home widget: (total unpaid paise, count).

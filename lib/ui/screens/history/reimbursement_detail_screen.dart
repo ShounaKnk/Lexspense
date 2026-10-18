@@ -11,6 +11,7 @@ import '../../../providers/database_provider.dart';
 import '../../../providers/expense_provider.dart';
 import '../../../providers/reimbursement_provider.dart';
 import '../../../providers/settings_provider.dart';
+import '../expense_detail/expense_detail_screen.dart';
 
 class ReimbursementDetailScreen extends ConsumerStatefulWidget {
   final Reimbursement reimbursement;
@@ -326,98 +327,108 @@ class _ReimbursementDetailScreenState extends ConsumerState<ReimbursementDetailS
                         borderRadius: BorderRadius.circular(14),
                         side: BorderSide(color: theme.dividerColor.withOpacity(0.1)),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(14),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: theme.colorScheme.primary.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(10),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(14),
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => ExpenseDetailScreen.fromView(item),
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(14),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.primary.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Icon(iconData, color: theme.colorScheme.primary, size: 20),
                                   ),
-                                  child: Icon(iconData, color: theme.colorScheme.primary, size: 20),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        item.categoryName,
-                                        style: const TextStyle(fontWeight: FontWeight.bold),
-                                      ),
-                                      Text(
-                                        '${item.matterTitle} • ${AppDateUtils.toDisplay(item.expense.expenseDate)}',
-                                        style: theme.textTheme.bodySmall?.copyWith(
-                                          color: theme.colorScheme.onSurfaceVariant,
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item.categoryName,
+                                          style: const TextStyle(fontWeight: FontWeight.bold),
                                         ),
-                                      ),
-                                    ],
+                                        Text(
+                                          '${item.matterTitle} • ${AppDateUtils.toDisplay(item.expense.expenseDate)}',
+                                          style: theme.textTheme.bodySmall?.copyWith(
+                                            color: theme.colorScheme.onSurfaceVariant,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
+                                  Text(
+                                    CurrencyUtils.format(item.expense.amountPaise),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (item.expense.notes != null && item.expense.notes!.isNotEmpty) ...[
+                                const SizedBox(height: 8),
                                 Text(
-                                  CurrencyUtils.format(item.expense.amountPaise),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color: theme.colorScheme.primary,
+                                  item.expense.notes!,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    fontStyle: FontStyle.italic,
+                                    color: theme.colorScheme.onSurfaceVariant,
                                   ),
                                 ),
                               ],
-                            ),
-                            if (item.expense.notes != null && item.expense.notes!.isNotEmpty) ...[
-                              const SizedBox(height: 8),
-                              Text(
-                                item.expense.notes!,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  fontStyle: FontStyle.italic,
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                            // Receipts thumbnail strip
-                            if (receipts.isNotEmpty) ...[
-                              const SizedBox(height: 10),
-                              SizedBox(
-                                height: 50,
-                                child: ListView.separated(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: receipts.length,
-                                  separatorBuilder: (_, __) => const SizedBox(width: 8),
-                                  itemBuilder: (context, rIdx) {
-                                    final receipt = receipts[rIdx];
-                                    return FutureBuilder<File>(
-                                      future: receiptStorage.getReceiptFile(receipt.fileName),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.hasData && snapshot.data!.existsSync()) {
-                                          return GestureDetector(
-                                            onTap: () => _showImageDialog(
-                                              snapshot.data!,
-                                              'Receipt for ${item.matterTitle}',
-                                            ),
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(8),
-                                              child: Image.file(
+                              // Receipts thumbnail strip
+                              if (receipts.isNotEmpty) ...[
+                                const SizedBox(height: 10),
+                                SizedBox(
+                                  height: 50,
+                                  child: ListView.separated(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: receipts.length,
+                                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                                    itemBuilder: (context, rIdx) {
+                                      final receipt = receipts[rIdx];
+                                      return FutureBuilder<File>(
+                                        future: receiptStorage.getReceiptFile(receipt.fileName),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.hasData && snapshot.data!.existsSync()) {
+                                            return GestureDetector(
+                                              onTap: () => _showImageDialog(
                                                 snapshot.data!,
-                                                width: 50,
-                                                height: 50,
-                                                fit: BoxFit.cover,
+                                                'Receipt for ${item.matterTitle}',
                                               ),
-                                            ),
-                                          );
-                                        }
-                                        return const SizedBox.shrink();
-                                      },
-                                    );
-                                  },
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(8),
+                                                child: Image.file(
+                                                  snapshot.data!,
+                                                  width: 50,
+                                                  height: 50,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                          return const SizedBox.shrink();
+                                        },
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
+                              ],
                             ],
-                          ],
+                          ),
                         ),
                       ),
                     );

@@ -6,6 +6,7 @@ class Reimbursement {
   final String? notes;
   final String? createdAt;
   final int itemCount;        // COUNT() from the list query, avoids N+1
+  final int? singleExpenseId;
   final String? singleCategoryName;
   final String? singleCategoryIcon;
   final String? singleMatterTitle;
@@ -18,6 +19,7 @@ class Reimbursement {
     this.notes,
     this.createdAt,
     this.itemCount = 0,
+    this.singleExpenseId,
     this.singleCategoryName,
     this.singleCategoryIcon,
     this.singleMatterTitle,
@@ -38,6 +40,7 @@ class Reimbursement {
         notes: map['notes'] as String?,
         createdAt: map['created_at'] as String?,
         itemCount: map['item_count'] as int? ?? 0,
+        singleExpenseId: map['single_expense_id'] as int?,
         singleCategoryName: map['single_category_name'] as String?,
         singleCategoryIcon: map['single_category_icon'] as String?,
         singleMatterTitle: map['single_matter_title'] as String?,

@@ -92,6 +92,7 @@ class ReimbursementRepository {
     final rows = await db.rawQuery('''
       SELECT r.*,
              COUNT(e.id) AS item_count,
+             MIN(e.id) AS single_expense_id,
              MIN(c.name) AS single_category_name,
              MIN(c.icon) AS single_category_icon,
              MIN(m.case_title) AS single_matter_title,
@@ -112,6 +113,7 @@ class ReimbursementRepository {
     final rows = await db.rawQuery('''
       SELECT r.*,
              COUNT(e.id) AS item_count,
+             MIN(e.id) AS single_expense_id,
              MIN(c.name) AS single_category_name,
              MIN(c.icon) AS single_category_icon,
              MIN(m.case_title) AS single_matter_title,
