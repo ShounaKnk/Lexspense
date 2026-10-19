@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:printing/printing.dart';
 import '../services/import_service.dart';
 import 'database_provider.dart';
 import 'expense_provider.dart';
@@ -153,17 +155,26 @@ class ImportNotifier extends Notifier<ImportState> {
     try {
       final templateBytes = ImportService.generateTemplateBytes();
 
-      // Attempt interactive file save picker where supported
-      String? savePath = await FilePicker.platform.saveFile(
-        dialogTitle: 'Save Sample Expense Template',
-        fileName: 'lexspense_sample_template.xlsx',
-        type: FileType.custom,
-        allowedExtensions: ['xlsx'],
-      );
+      String? savePath;
+      if (!Platform.isAndroid && !Platform.isIOS) {
+        try {
+          savePath = await FilePicker.platform.saveFile(
+            dialogTitle: 'Save Sample Expense Template',
+            fileName: 'lexspense_sample_template.xlsx',
+            type: FileType.custom,
+            allowedExtensions: ['xlsx'],
+          );
+        } catch (_) {}
+      }
 
       if (savePath == null) {
-        // Fallback to Downloads or Documents directory
-        Directory? targetDir = await getDownloadsDirectory();
+        Directory? targetDir;
+        if (Platform.isAndroid) {
+          final extDir = await getExternalStorageDirectory();
+          targetDir = extDir ?? await getApplicationDocumentsDirectory();
+        } else {
+          targetDir = await getDownloadsDirectory();
+        }
         targetDir ??= await getApplicationDocumentsDirectory();
         savePath = p.join(targetDir.path, 'lexspense_sample_template.xlsx');
       }
@@ -171,6 +182,17 @@ class ImportNotifier extends Notifier<ImportState> {
       final file = File(savePath);
       await file.writeAsBytes(templateBytes);
       state = state.copyWith(savedTemplatePath: savePath);
+
+      // On mobile devices, open share sheet so user can easily save to Drive, Files, or send to others
+      if (Platform.isAndroid || Platform.isIOS) {
+        try {
+          await Printing.sharePdf(
+            bytes: Uint8List.fromList(templateBytes),
+            filename: 'lexspense_sample_template.xlsx',
+          );
+        } catch (_) {}
+      }
+
       return savePath;
     } catch (e) {
       state = state.copyWith(

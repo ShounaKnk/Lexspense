@@ -38,3 +38,10 @@
 
 # FilePicker plugin rules
 -keep class com.mr.flutter.plugin.filepicker.** { *; }
+
+# Printing plugin rules
+-keep class net.nfet.flutter.printing.** { *; }
+
+# Shared preferences plugin rules
+-keep class io.flutter.plugins.sharedpreferences.** { *; }
+

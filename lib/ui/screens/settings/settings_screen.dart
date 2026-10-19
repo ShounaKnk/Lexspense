@@ -76,6 +76,72 @@ class SettingsScreen extends ConsumerWidget {
     }
   }
 
+  Widget _buildProfileCard(
+    BuildContext context,
+    WidgetRef ref,
+    ThemeData theme,
+    LawyerProfile profile,
+  ) {
+    return Card(
+      elevation: 0.5,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: theme.colorScheme.primary.withOpacity(0.2)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(Icons.person_rounded, color: theme.colorScheme.primary, size: 28),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    profile.lawyerName,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    profile.firmName,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Printed on generated PDF vouchers',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: theme.colorScheme.primary,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.edit_rounded),
+              tooltip: 'Edit Profile',
+              onPressed: () => _editProfile(context, ref, profile),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(settingsProvider);
@@ -91,67 +157,8 @@ class SettingsScreen extends ConsumerWidget {
           // Profile Card
           profileAsync.when(
             loading: () => const LinearProgressIndicator(),
-            error: (e, _) => Text('Error: $e'),
-            data: (profile) {
-              return Card(
-                elevation: 0.5,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: theme.colorScheme.primary.withOpacity(0.2)),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 52,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Icon(Icons.person_rounded, color: theme.colorScheme.primary, size: 28),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              profile.lawyerName,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              profile.firmName,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Printed on generated PDF vouchers',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: theme.colorScheme.primary,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.edit_rounded),
-                        tooltip: 'Edit Profile',
-                        onPressed: () => _editProfile(context, ref, profile),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
+            error: (_, __) => _buildProfileCard(context, ref, theme, const LawyerProfile()),
+            data: (profile) => _buildProfileCard(context, ref, theme, profile),
           ),
           const SizedBox(height: 20),
 
