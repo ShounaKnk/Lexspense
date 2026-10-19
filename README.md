@@ -137,6 +137,25 @@ Add the Lexspense widget to your phone's home screen for fast logging outside co
 
 ---
 
+### 10. Importing Historical Expenses from Excel (.xlsx / .xls)
+If you have been tracking your legal expenses in an Excel spreadsheet or Google Sheet, you can import your entire history directly into Lexspense:
+1. Go to **Settings** > **Import from Excel** (under the *Data Import & Spreadsheets* section).
+2. Tap **Download Sample Template** to review the expected spreadsheet format.
+3. Your spreadsheet should include a header row with the following column headers:
+   - **`Date`** *(Required)*: Expense date (`DD/MM/YYYY`, `DD-MM-YYYY`, or `YYYY-MM-DD`).
+   - **`Amount`** *(Required)*: Expense amount in Rupees (e.g. `250.00` or `1500`).
+   - **`Category`** *(Required)*: e.g. *Court Fees*, *Travel & Transport*, *Printing & Stationery*, etc.
+   - **`Case`** *(Required)*: Case title / Matter name (e.g. *State v. Sharma*).
+   - **`Court`** *(Optional)*: Court or Forum (e.g. *High Court of Delhi*).
+   - **`Compensated`** *(Optional)*: `Yes` / `Paid` / `True` or `No` / `Pending`.
+     - **Compensated rows** appear directly in **Reimbursement History** as single settled records (they will not clutter your main Dashboard).
+     - **Uncompensated rows** appear on your **Dashboard** ready to be claimed or reimbursed.
+   - **`Notes`** *(Optional)*: Description or remarks (e.g. *Certified copy urgent fee*).
+4. Tap **Select Excel File (.xlsx / .xls)** and pick your spreadsheet.
+5. Lexspense will parse the file, auto-create any missing client matters, courts, or categories, safely skip duplicates, and import all valid records into your local database!
+
+---
+
 ## 📁 Project Architecture
 
 ```
@@ -178,11 +197,13 @@ lib/
 │   ├── database_provider.dart               # Repositories & services registry
 │   ├── expense_provider.dart                # Unpaid expenses & batch expenses
 │   ├── matter_provider.dart                 # Active & all matters
+│   ├── import_provider.dart                 # Excel picking, parsing & status state
 │   ├── reimbursement_provider.dart          # Reimbursements list & detail
 │   ├── selection_provider.dart              # Multi-select state for dashboard
 │   └── settings_provider.dart               # SharedPreferences counsel profile
 │
 ├── services/                                # Business & hardware services
+│   ├── import_service.dart                  # Excel parser & SQLite bulk import engine
 │   ├── pdf_service.dart                     # PDF voucher layout & system share sheet
 │   ├── receipt_storage_service.dart         # App-private filesystem management
 │   └── widget_sync_service.dart             # Android HomeWidget sync
@@ -215,7 +236,9 @@ lib/
         │
         └── settings/                        # Counsel profile & category settings
             ├── category_management_screen.dart
-            └── settings_screen.dart
+            ├── settings_screen.dart
+            └── widgets/
+                └── import_bottom_sheet.dart # Excel import progress, stats & error dialog
 ```
 ---
 

@@ -1,3 +1,4 @@
+// ignore_for_file: prefer_const_constructors
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lexledger/data/models/client_matter.dart';
 import 'package:lexledger/data/models/expense.dart';

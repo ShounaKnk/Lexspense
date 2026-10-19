@@ -305,7 +305,7 @@ class _MattersScreenState extends ConsumerState<MattersScreen> {
                                     isArchived ? Icons.unarchive_rounded : Icons.archive_rounded,
                                     size: 18,
                                   ),
-                                  SizedBox(width: 8),
+                                  const SizedBox(width: 8),
                                   Text(isArchived ? 'Activate' : 'Archive'),
                                 ],
                               ),

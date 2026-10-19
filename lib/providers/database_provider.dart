@@ -9,6 +9,7 @@ import '../data/repositories/receipt_repository.dart';
 import '../services/receipt_storage_service.dart';
 import '../services/widget_sync_service.dart';
 import '../services/pdf_service.dart';
+import '../services/import_service.dart';
 
 /// Core database helper provider.
 final databaseHelperProvider = Provider<DatabaseHelper>(
@@ -51,5 +52,15 @@ final widgetSyncServiceProvider = Provider<WidgetSyncService>(
 
 final pdfServiceProvider = Provider<PdfService>(
   (ref) => PdfService(ref.watch(receiptStorageServiceProvider)),
+);
+
+final importServiceProvider = Provider<ImportService>(
+  (ref) => ImportService(
+    dbHelper: ref.watch(databaseHelperProvider),
+    matterRepo: ref.watch(matterRepositoryProvider),
+    categoryRepo: ref.watch(categoryRepositoryProvider),
+    forumRepo: ref.watch(courtForumRepositoryProvider),
+    expenseRepo: ref.watch(expenseRepositoryProvider),
+  ),
 );
 

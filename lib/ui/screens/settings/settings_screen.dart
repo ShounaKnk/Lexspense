@@ -2,12 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../providers/settings_provider.dart';
+import '../../../providers/import_provider.dart';
 import '../matters/matters_screen.dart';
 import '../forums/forums_screen.dart';
 import 'category_management_screen.dart';
+import 'widgets/import_bottom_sheet.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
+
+  Future<void> _downloadTemplate(BuildContext context, WidgetRef ref) async {
+    final path = await ref.read(importProvider.notifier).downloadTemplate();
+    if (context.mounted && path != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Sample template saved to:\n$path'),
+          duration: const Duration(seconds: 4),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
 
   Future<void> _editProfile(BuildContext context, WidgetRef ref, LawyerProfile current) async {
     final nameController = TextEditingController(text: current.lawyerName);
@@ -229,6 +244,69 @@ class SettingsScreen extends ConsumerWidget {
                       MaterialPageRoute(builder: (_) => const CategoryManagementScreen()),
                     );
                   },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Import Section
+          Text(
+            'DATA IMPORT & SPREADSHEETS',
+            style: theme.textTheme.labelMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.1,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          Card(
+            elevation: 0.5,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: theme.dividerColor.withOpacity(0.1)),
+            ),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2E7D32).withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.upload_file_rounded,
+                      color: Color(0xFF2E7D32),
+                      size: 20,
+                    ),
+                  ),
+                  title: const Text('Import from Excel'),
+                  subtitle: const Text('Upload expense records from spreadsheet (.xlsx)'),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () => showImportBottomSheet(context),
+                ),
+                Divider(height: 1, indent: 56, color: theme.dividerColor.withOpacity(0.1)),
+                ListTile(
+                  leading: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0288D1).withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.download_rounded,
+                      color: Color(0xFF0288D1),
+                      size: 20,
+                    ),
+                  ),
+                  title: const Text('Download Sample Template'),
+                  subtitle: const Text('Get official Excel spreadsheet template'),
+                  trailing: const Icon(Icons.download_rounded),
+                  onTap: () => _downloadTemplate(context, ref),
                 ),
               ],
             ),
