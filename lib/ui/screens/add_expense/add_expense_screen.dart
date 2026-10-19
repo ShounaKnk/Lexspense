@@ -196,12 +196,17 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
       await ref.read(widgetSyncServiceProvider).updateWidgetData();
 
       if (mounted) {
+        final theme = Theme.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               'Logged ${CurrencyUtils.format(paise)} successfully!',
+              style: TextStyle(
+                color: theme.colorScheme.onPrimary,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
+            backgroundColor: theme.colorScheme.primary,
           ),
         );
         Navigator.of(context).pop();

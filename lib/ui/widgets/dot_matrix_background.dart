@@ -19,8 +19,8 @@ class DotMatrixBackground extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final dotColor = isDark
-        ? Colors.white.withOpacity(0.08)
-        : Colors.black.withOpacity(0.08);
+        ? Colors.white.withOpacity(0.12)
+        : Colors.black.withOpacity(0.12);
 
     return Container(
       color: theme.scaffoldBackgroundColor,
