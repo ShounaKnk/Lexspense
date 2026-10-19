@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../providers/settings_provider.dart';
 import '../../../providers/import_provider.dart';
 import '../../widgets/dot_matrix_background.dart';
@@ -354,6 +355,26 @@ class SettingsScreen extends ConsumerWidget {
             Center(
               child: Column(
                 children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF16161A) : const Color(0xFFF0F0F4),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF28282E) : const Color(0xFFDCDCE2),
+                        width: 0.8,
+                      ),
+                    ),
+                    child: SvgPicture.asset(
+                      isDark
+                          ? 'assets/images/icon_dark_mode.svg'
+                          : 'assets/images/icon_light_mode.svg',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
                   Text(
                     'Lexspense v1.0.0',
                     style: theme.textTheme.bodySmall?.copyWith(

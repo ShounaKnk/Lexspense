@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../core/utils/currency_utils.dart';
 import '../../../data/models/expense_view.dart';
 import '../../../providers/database_provider.dart';
@@ -92,26 +93,17 @@ class DashboardScreen extends ConsumerWidget {
     final selectedIds = ref.watch(selectedExpensesProvider);
     final selectionNotifier = ref.read(selectedExpensesProvider.notifier);
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.onSurface.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: theme.dividerColor, width: 0.8),
-              ),
-              child: Icon(Icons.gavel_rounded, color: theme.colorScheme.onSurface, size: 18),
-            ),
-            const SizedBox(width: 10),
-            const Text(
-              'Lexspense',
-              style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: -0.3),
-            ),
-          ],
+        title: SvgPicture.asset(
+          isDark
+              ? 'assets/images/logo_dark_mode.svg'
+              : 'assets/images/logo_light_mode.svg',
+          height: 24,
+          fit: BoxFit.contain,
+          alignment: Alignment.centerLeft,
         ),
         actions: [
           IconButton(
