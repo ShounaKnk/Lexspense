@@ -25,3 +25,16 @@
 
 # Suppress Play Store deferred component / split install warnings referenced by Flutter engine
 -dontwarn com.google.android.play.core.**
+
+# AndroidX Startup, WorkManager & Room rules (required by home_widget)
+-keep class androidx.startup.** { *; }
+-keep class androidx.work.** { *; }
+-keep class androidx.work.impl.** { *; }
+-keep class androidx.work.impl.WorkDatabase_Impl { *; }
+-keep class * extends androidx.work.Worker { *; }
+-keep class * extends androidx.work.ListenableWorker { *; }
+-keep class * extends androidx.room.RoomDatabase { *; }
+-dontwarn androidx.work.impl.**
+
+# FilePicker plugin rules
+-keep class com.mr.flutter.plugin.filepicker.** { *; }
