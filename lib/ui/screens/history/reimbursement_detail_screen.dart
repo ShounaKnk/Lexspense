@@ -272,11 +272,11 @@ class _ReimbursementDetailScreenState extends ConsumerState<ReimbursementDetailS
                             ),
                             Text(
                               CurrencyUtils.format(widget.reimbursement.totalAmountPaise).replaceAll('₹', '').trim(),
-                              style: AppTypography.ndot(
+                              style: AppTypography.figure(
                                 fontSize: 32,
                                 fontWeight: FontWeight.w800,
                                 color: theme.colorScheme.onSurface,
-                                letterSpacing: 1.0,
+                                letterSpacing: -0.5,
                               ),
                             ),
                           ],

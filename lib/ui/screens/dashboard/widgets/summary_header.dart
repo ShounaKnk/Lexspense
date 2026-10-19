@@ -122,16 +122,17 @@ class SummaryHeader extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: AppTypography.fontFamilyBase,
                   color: textColor,
-                  fontSize: 22,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
                 CurrencyUtils.formatPlain(totalPaise),
-                style: AppTypography.ndot(
-                  fontSize: 30,
+                style: AppTypography.figure(
+                  fontSize: 34,
+                  fontWeight: FontWeight.w800,
                   color: textColor,
-                  letterSpacing: 1.4,
+                  letterSpacing: -0.5,
                 ),
               ),
             ],

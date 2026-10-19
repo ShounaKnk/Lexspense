@@ -316,11 +316,11 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
                       ),
                       Text(
                         CurrencyUtils.format(expense.amountPaise).replaceAll('₹', '').trim(),
-                        style: AppTypography.ndot(
+                        style: AppTypography.figure(
                           fontSize: 34,
                           fontWeight: FontWeight.w800,
                           color: theme.colorScheme.onSurface,
-                          letterSpacing: 1.0,
+                          letterSpacing: -0.5,
                         ),
                       ),
                     ],

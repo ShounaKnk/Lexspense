@@ -47,19 +47,19 @@ class AmountInput extends StatelessWidget {
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
               ],
-              style: AppTypography.ndot(
-                fontSize: 32,
-                fontWeight: FontWeight.w700,
+              style: AppTypography.figure(
+                fontSize: 34,
+                fontWeight: FontWeight.w800,
                 color: theme.colorScheme.onSurface,
-                letterSpacing: 1.0,
+                letterSpacing: -0.5,
               ),
               decoration: InputDecoration(
                 hintText: '0.00',
-                hintStyle: AppTypography.ndot(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w700,
+                hintStyle: AppTypography.figure(
+                  fontSize: 34,
+                  fontWeight: FontWeight.w800,
                   color: theme.colorScheme.onSurfaceVariant.withOpacity(0.3),
-                  letterSpacing: 1.0,
+                  letterSpacing: -0.5,
                 ),
                 border: InputBorder.none,
                 isDense: true,

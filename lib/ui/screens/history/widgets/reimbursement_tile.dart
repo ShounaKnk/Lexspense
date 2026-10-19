@@ -184,10 +184,11 @@ class ReimbursementTile extends StatelessWidget {
                 children: [
                   Text(
                     CurrencyUtils.format(reimbursement.totalAmountPaise),
-                    style: AppTypography.ndot(
+                    style: AppTypography.figure(
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w700,
                       color: isDark ? Colors.white : Colors.black,
+                      letterSpacing: -0.3,
                     ),
                   ),
                   const SizedBox(height: 4),

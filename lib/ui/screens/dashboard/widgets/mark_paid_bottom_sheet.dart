@@ -176,11 +176,11 @@ class _MarkPaidBottomSheetState extends State<MarkPaidBottomSheet> {
                     ),
                     Text(
                       CurrencyUtils.format(widget.totalPaise).replaceAll('₹', '').trim(),
-                      style: AppTypography.ndot(
-                        fontSize: 22,
+                      style: AppTypography.figure(
+                        fontSize: 24,
                         fontWeight: FontWeight.w800,
                         color: theme.colorScheme.onSurface,
-                        letterSpacing: 0.8,
+                        letterSpacing: -0.5,
                       ),
                     ),
                   ],
