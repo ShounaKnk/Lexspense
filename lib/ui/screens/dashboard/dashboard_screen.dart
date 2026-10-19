@@ -13,6 +13,7 @@ import '../expense_detail/expense_detail_screen.dart';
 import 'widgets/expense_list_tile.dart';
 import 'widgets/mark_paid_bottom_sheet.dart';
 import 'widgets/summary_header.dart';
+import '../../widgets/dot_matrix_background.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -64,7 +65,7 @@ class DashboardScreen extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
       ),
       builder: (ctx) => MarkPaidBottomSheet(
         totalPaise: totalPaise,
@@ -97,12 +98,13 @@ class DashboardScreen extends ConsumerWidget {
         title: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(8),
+                color: theme.colorScheme.onSurface.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: theme.dividerColor, width: 0.8),
               ),
-              child: Icon(Icons.gavel_rounded, color: theme.colorScheme.primary, size: 20),
+              child: Icon(Icons.gavel_rounded, color: theme.colorScheme.onSurface, size: 18),
             ),
             const SizedBox(width: 10),
             const Text(
@@ -113,7 +115,7 @@ class DashboardScreen extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add_circle_outline_rounded, size: 26),
+            icon: const Icon(Icons.add_circle_outline_rounded, size: 24),
             tooltip: 'Add Expense',
             onPressed: () {
               Navigator.of(context).push(
@@ -124,8 +126,9 @@ class DashboardScreen extends ConsumerWidget {
           const SizedBox(width: 8),
         ],
       ),
-      body: unpaidAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+      body: DotMatrixBackground(
+        child: unpaidAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -290,7 +293,8 @@ class DashboardScreen extends ConsumerWidget {
           );
         },
       ),
-      floatingActionButton: selectedIds.isNotEmpty
+    ),
+    floatingActionButton: selectedIds.isNotEmpty
           ? unpaidAsync.maybeWhen(
               data: (expenses) {
                 final selectedExpenses = expenses
@@ -345,14 +349,16 @@ class _QuickNavCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Card(
-      elevation: 0.5,
+      elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.dividerColor.withOpacity(0.12)),
+        borderRadius: BorderRadius.circular(6),
+        side: BorderSide(color: theme.dividerColor, width: 0.8),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(6),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -361,10 +367,18 @@ class _QuickNavCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(10),
+                  color: isDark ? const Color(0xFF1E1E22) : const Color(0xFFECECEF),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: isDark ? const Color(0xFF2E2E34) : const Color(0xFFD6D6DC),
+                    width: 0.8,
+                  ),
                 ),
-                child: Icon(icon, color: color, size: 20),
+                child: Icon(
+                  icon,
+                  color: isDark ? Colors.white : Colors.black,
+                  size: 18,
+                ),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -377,6 +391,7 @@ class _QuickNavCard extends StatelessWidget {
                       style: theme.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
+                        letterSpacing: -0.2,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

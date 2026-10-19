@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/icon_map.dart';
 import '../../widgets/category_icon_badge.dart';
+import '../../widgets/dot_matrix_background.dart';
 import '../../../data/models/expense_category.dart';
 import '../../../providers/category_provider.dart';
 import '../../../providers/database_provider.dart';
@@ -50,21 +51,23 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
 
                   return InkWell(
                     onTap: () => setDialogState(() => selectedIcon = iconKey),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(4),
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: isSelected ? iconColor : iconBg,
-                        borderRadius: BorderRadius.circular(10),
+                        color: isSelected ? (isDark ? Colors.white : Colors.black) : iconBg,
+                        borderRadius: BorderRadius.circular(4),
                         border: Border.all(
-                          color: isSelected ? iconColor : Colors.transparent,
-                          width: 1.5,
+                          color: isSelected
+                              ? (isDark ? Colors.white : Colors.black)
+                              : (isDark ? const Color(0xFF28282E) : const Color(0xFFD6D6DC)),
+                          width: 1.0,
                         ),
                       ),
                       child: Icon(
                         IconMap.fromKey(iconKey),
-                        color: isSelected ? Colors.white : iconColor,
-                        size: 22,
+                        color: isSelected ? (isDark ? Colors.black : Colors.white) : iconColor,
+                        size: 20,
                       ),
                     ),
                   );
@@ -126,53 +129,56 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
       appBar: AppBar(
         title: const Text('Expense Categories'),
       ),
-      body: allCategoriesAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error loading categories: $e')),
-        data: (categories) {
-          return ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: categories.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
-            itemBuilder: (context, index) {
-              final cat = categories[index];
+      body: DotMatrixBackground(
+        child: allCategoriesAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, _) => Center(child: Text('Error loading categories: $e')),
+          data: (categories) {
+            return ListView.separated(
+              padding: const EdgeInsets.all(16),
+              itemCount: categories.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 8),
+              itemBuilder: (context, index) {
+                final cat = categories[index];
 
-              return Card(
-                elevation: 0.5,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  side: BorderSide(color: theme.dividerColor.withOpacity(0.1)),
-                ),
-                child: SwitchListTile(
-                  secondary: CategoryIconBadge(
-                    iconKey: cat.icon,
-                    size: 40,
-                    iconSize: 20,
-                    borderRadius: 10,
-                    customColor: !cat.isActive ? theme.colorScheme.onSurfaceVariant.withOpacity(0.5) : null,
-                    customBgColor: !cat.isActive ? theme.dividerColor.withOpacity(0.15) : null,
+                return Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
+                    side: BorderSide(color: theme.dividerColor, width: 0.8),
                   ),
-                  title: Text(
-                    cat.name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      decoration: !cat.isActive ? TextDecoration.lineThrough : null,
+                  child: SwitchListTile(
+                    secondary: CategoryIconBadge(
+                      iconKey: cat.icon,
+                      size: 38,
+                      iconSize: 18,
+                      borderRadius: 6,
+                      customColor: !cat.isActive ? theme.colorScheme.onSurfaceVariant.withOpacity(0.5) : null,
+                      customBgColor: !cat.isActive ? theme.dividerColor.withOpacity(0.15) : null,
                     ),
-                  ),
-                  subtitle: Text(
-                    cat.isActive ? 'Active in expense picker' : 'Disabled / Hidden',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: theme.colorScheme.onSurfaceVariant,
+                    title: Text(
+                      cat.name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.2,
+                        decoration: !cat.isActive ? TextDecoration.lineThrough : null,
+                      ),
                     ),
+                    subtitle: Text(
+                      cat.isActive ? 'Active in expense picker' : 'Disabled / Hidden',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    value: cat.isActive,
+                    onChanged: (val) => _toggleCategory(cat, val),
                   ),
-                  value: cat.isActive,
-                  onChanged: (val) => _toggleCategory(cat, val),
-                ),
-              );
-            },
-          );
-        },
+                );
+              },
+            );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddCategoryDialog,

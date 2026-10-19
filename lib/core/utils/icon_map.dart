@@ -23,36 +23,14 @@ class IconMap {
     return _map[key] ?? Icons.category_rounded;
   }
 
-  /// Curated color for each category icon.
+  /// Monochrome advocate icon colors: crisp white on dark, stark black on light.
   static Color colorFor(String? key, {bool isDark = false}) {
-    switch (key) {
-      case 'gavel':
-        return isDark ? const Color(0xFF90CAF9) : const Color(0xFF1976D2); // Royal Blue
-      case 'print':
-        return isDark ? const Color(0xFF80CBC4) : const Color(0xFF00897B); // Teal
-      case 'directions_car':
-        return isDark ? const Color(0xFFFFAB91) : const Color(0xFFF4511E); // Warm Orange
-      case 'local_gas_station':
-        return isDark ? const Color(0xFFEF9A9A) : const Color(0xFFE53935); // Crimson Red
-      case 'local_post_office':
-        return isDark ? const Color(0xFFCE93D8) : const Color(0xFF8E24AA); // Purple
-      case 'description':
-        return isDark ? const Color(0xFF80DEEA) : const Color(0xFF00ACC1); // Aqua Cyan
-      case 'receipt':
-        return isDark ? const Color(0xFFA5D6A7) : const Color(0xFF2E7D32); // Emerald Green
-      case 'attach_money':
-        return isDark ? const Color(0xFFFFCC80) : const Color(0xFFFB8C00); // Amber
-      case 'more_horiz':
-      case 'category':
-      default:
-        return isDark ? const Color(0xFFB0BEC5) : const Color(0xFF546E7A); // Slate Blue-Grey
-    }
+    return isDark ? const Color(0xFFF5F5F5) : const Color(0xFF0F0F0F);
   }
 
-  /// Tinted container background for the category icon badge.
+  /// Architectural container background for the category icon badge.
   static Color backgroundFor(String? key, {bool isDark = false}) {
-    final fg = colorFor(key, isDark: isDark);
-    return fg.withOpacity(isDark ? 0.22 : 0.12);
+    return isDark ? const Color(0xFF1E1E22) : const Color(0xFFECECEF);
   }
 
   /// All available icon keys for the category management UI.

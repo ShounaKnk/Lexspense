@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/date_utils.dart';
 import '../../../widgets/category_icon_badge.dart';
@@ -18,17 +18,18 @@ class ReimbursementTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final isSingleExpense = reimbursement.itemCount == 1;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      elevation: 0.5,
+      elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.dividerColor.withOpacity(0.1)),
+        borderRadius: BorderRadius.circular(6),
+        side: BorderSide(color: theme.dividerColor),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(6),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -38,23 +39,26 @@ class ReimbursementTile extends StatelessWidget {
               if (isSingleExpense)
                 CategoryIconBadge(
                   iconKey: reimbursement.singleCategoryIcon,
-                  size: 44,
-                  iconSize: 22,
-                  borderRadius: 12,
+                  size: 42,
+                  iconSize: 20,
+                  borderRadius: 6,
                 )
               else
                 Container(
-                  width: 44,
-                  height: 44,
+                  width: 42,
+                  height: 42,
                   decoration: BoxDecoration(
-                    color: AppColors.paidBadge.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(12),
+                    color: isDark ? const Color(0xFF1E1E22) : const Color(0xFFECECEF),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: isDark ? const Color(0xFF2E2E32) : const Color(0xFFDCDCE2),
+                    ),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Icon(
                       Icons.receipt_long_rounded,
-                      color: AppColors.paidBadge,
-                      size: 22,
+                      color: isDark ? Colors.white : Colors.black,
+                      size: 20,
                     ),
                   ),
                 ),
@@ -94,15 +98,18 @@ class ReimbursementTile extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
                             decoration: BoxDecoration(
-                              color: AppColors.paidBadge.withOpacity(0.12),
-                              borderRadius: BorderRadius.circular(6),
+                              color: isDark ? const Color(0xFF222226) : const Color(0xFFEEEEF2),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: isDark ? const Color(0xFF333338) : const Color(0xFFDCDCE0),
+                              ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Claimed',
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.paidBadge,
+                                color: isDark ? Colors.white : Colors.black,
                               ),
                             ),
                           ),
@@ -130,15 +137,18 @@ class ReimbursementTile extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.surfaceVariant.withOpacity(0.6),
-                              borderRadius: BorderRadius.circular(8),
+                              color: isDark ? const Color(0xFF202024) : const Color(0xFFEDEDF0),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: isDark ? const Color(0xFF303036) : const Color(0xFFDCDCE2),
+                              ),
                             ),
                             child: Text(
                               '${reimbursement.itemCount} items',
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
-                                color: theme.colorScheme.onSurfaceVariant,
+                                color: isDark ? Colors.white : Colors.black,
                               ),
                             ),
                           ),
@@ -174,9 +184,10 @@ class ReimbursementTile extends StatelessWidget {
                 children: [
                   Text(
                     CurrencyUtils.format(reimbursement.totalAmountPaise),
-                    style: theme.textTheme.titleMedium?.copyWith(
+                    style: AppTypography.ndot(
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.paidBadge,
+                      color: isDark ? Colors.white : Colors.black,
                     ),
                   ),
                   const SizedBox(height: 4),

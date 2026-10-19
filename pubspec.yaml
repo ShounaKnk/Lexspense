@@ -32,3 +32,12 @@ flutter:
   assets:
     - assets/fonts/
     - assets/templates/
+
+  fonts:
+    - family: SpaceGrotesk
+      fonts:
+        - asset: assets/fonts/SpaceGrotesk.otf
+    - family: NDot
+      fonts:
+        - asset: assets/fonts/Ndot55.otf
+

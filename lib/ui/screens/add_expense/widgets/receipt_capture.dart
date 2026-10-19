@@ -39,7 +39,7 @@ class ReceiptCapture extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
       ),
       builder: (ctx) => SafeArea(
         child: Padding(
@@ -73,6 +73,7 @@ class ReceiptCapture extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,7 +83,10 @@ class ReceiptCapture extends StatelessWidget {
           children: [
             Text(
               'Receipts & Vouchers',
-              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                letterSpacing: -0.2,
+              ),
             ),
             TextButton.icon(
               onPressed: () => _showSourceSheet(context),
@@ -99,18 +103,18 @@ class ReceiptCapture extends StatelessWidget {
             child: Container(
               height: 90,
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(14),
+                color: isDark ? const Color(0xFF121216) : Colors.white,
+                borderRadius: BorderRadius.circular(6),
                 border: Border.all(
-                  color: theme.dividerColor.withOpacity(0.3),
-                  style: BorderStyle.solid,
+                  color: theme.dividerColor,
+                  width: 0.8,
                 ),
               ),
               child: Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.receipt_long_rounded, color: theme.colorScheme.primary),
+                    Icon(Icons.receipt_long_rounded, color: theme.colorScheme.onSurface),
                     const SizedBox(width: 8),
                     Text(
                       'Tap to attach receipt or cash memo',
@@ -135,7 +139,7 @@ class ReceiptCapture extends StatelessWidget {
                 return Stack(
                   children: [
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(4),
                       child: Image.file(
                         file,
                         width: 100,
@@ -150,9 +154,9 @@ class ReceiptCapture extends StatelessWidget {
                         onTap: () => onImageRemoved(index),
                         child: Container(
                           padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            color: Colors.black54,
-                            shape: BoxShape.circle,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.75),
+                            borderRadius: BorderRadius.circular(3),
                           ),
                           child: const Icon(Icons.close_rounded, color: Colors.white, size: 14),
                         ),

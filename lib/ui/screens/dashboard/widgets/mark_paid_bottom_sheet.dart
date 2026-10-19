@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/date_utils.dart';
 
@@ -103,10 +103,18 @@ class _MarkPaidBottomSheetState extends State<MarkPaidBottomSheet> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.paidBadge.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(10),
+                  color: isDark ? const Color(0xFF1E1E22) : const Color(0xFFECECEF),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: isDark ? const Color(0xFF2E2E34) : const Color(0xFFD6D6DC),
+                    width: 0.8,
+                  ),
                 ),
-                child: const Icon(Icons.check_circle_rounded, color: AppColors.paidBadge, size: 22),
+                child: Icon(
+                  Icons.check_circle_rounded,
+                  color: isDark ? Colors.white : Colors.black,
+                  size: 20,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -115,7 +123,10 @@ class _MarkPaidBottomSheetState extends State<MarkPaidBottomSheet> {
                   children: [
                     Text(
                       'Confirm Reimbursement',
-                      style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: -0.2,
+                      ),
                     ),
                     Text(
                       'Settle ${widget.count} selected item(s)',
@@ -134,10 +145,11 @@ class _MarkPaidBottomSheetState extends State<MarkPaidBottomSheet> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF232D24) : const Color(0xFFE8F5E9),
-              borderRadius: BorderRadius.circular(12),
+              color: isDark ? const Color(0xFF121216) : Colors.white,
+              borderRadius: BorderRadius.circular(6),
               border: Border.all(
-                color: theme.colorScheme.primary.withOpacity(0.3),
+                color: isDark ? const Color(0xFF28282E) : const Color(0xFF1A1A1E),
+                width: 1.0,
               ),
             ),
             child: Row(
@@ -147,15 +159,31 @@ class _MarkPaidBottomSheetState extends State<MarkPaidBottomSheet> {
                   'Total Payout Amount',
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.primary,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
-                Text(
-                  CurrencyUtils.format(widget.totalPaise),
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary,
-                  ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      '₹ ',
+                      style: AppTypography.spaceGrotesk(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    Text(
+                      CurrencyUtils.format(widget.totalPaise).replaceAll('₹', '').trim(),
+                      style: AppTypography.ndot(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: theme.colorScheme.onSurface,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -164,13 +192,13 @@ class _MarkPaidBottomSheetState extends State<MarkPaidBottomSheet> {
 
           // Date Paid Picker
           ListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const Text('Settlement Date'),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+            title: const Text('Settlement Date', style: TextStyle(fontWeight: FontWeight.w600)),
             subtitle: Text(AppDateUtils.toDisplay(AppDateUtils.toDbString(_selectedDate))),
-            trailing: const Icon(Icons.calendar_today_rounded),
+            trailing: const Icon(Icons.calendar_today_rounded, size: 18),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: theme.dividerColor.withOpacity(0.3)),
+              borderRadius: BorderRadius.circular(6),
+              side: BorderSide(color: theme.dividerColor, width: 0.8),
             ),
             onTap: _pickDate,
           ),
@@ -184,7 +212,7 @@ class _MarkPaidBottomSheetState extends State<MarkPaidBottomSheet> {
                   ? 'Notes / Reference (Optional)'
                   : 'Batch Notes / Reference (Optional)',
               hintText: 'Enter notes or transaction reference',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
             ),
           ),
           const SizedBox(height: 24),
@@ -194,15 +222,18 @@ class _MarkPaidBottomSheetState extends State<MarkPaidBottomSheet> {
             onPressed: _isSubmitting ? null : _submit,
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
               backgroundColor: theme.colorScheme.primary,
-              foregroundColor: Colors.white,
+              foregroundColor: theme.colorScheme.onPrimary,
             ),
             child: _isSubmitting
-                ? const SizedBox(
+                ? SizedBox(
                     width: 24,
                     height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: theme.colorScheme.onPrimary,
+                    ),
                   )
                 : Text(
                     'Mark Reimbursed (${CurrencyUtils.format(widget.totalPaise)})',

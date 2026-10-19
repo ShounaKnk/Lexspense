@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_utils.dart';
 import '../../../core/utils/date_utils.dart';
 import '../../../data/models/receipt_image.dart';
@@ -10,7 +9,9 @@ import '../../../providers/database_provider.dart';
 import '../../../providers/expense_provider.dart';
 import '../../../providers/reimbursement_provider.dart';
 import '../../../providers/settings_provider.dart';
+import '../../../core/theme/app_typography.dart';
 import '../../widgets/category_icon_badge.dart';
+import '../../widgets/dot_matrix_background.dart';
 import '../expense_detail/expense_detail_screen.dart';
 
 class ReimbursementDetailScreen extends ConsumerStatefulWidget {
@@ -203,233 +204,263 @@ class _ReimbursementDetailScreenState extends ConsumerState<ReimbursementDetailS
           const SizedBox(width: 8),
         ],
       ),
-      body: expensesAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
-        data: (expenses) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Header Banner
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.paidBadge.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: AppColors.paidBadge.withOpacity(0.2)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: AppColors.paidBadge,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Text(
-                              'SETTLED / REIMBURSED',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
+      body: DotMatrixBackground(
+        child: expensesAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, _) => Center(child: Text('Error: $e')),
+          data: (expenses) {
+            final isDark = theme.brightness == Brightness.dark;
+
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Header Banner
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF121216) : Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF28282E) : const Color(0xFF1A1A1E),
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: isDark ? Colors.white : Colors.black,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                'SETTLED / REIMBURSED',
+                                style: TextStyle(
+                                  color: isDark ? Colors.black : Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.5,
+                                ),
                               ),
                             ),
-                          ),
-                          Text(
-                            AppDateUtils.toDisplay(widget.reimbursement.datePaid),
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 14),
-                      Text(
-                        CurrencyUtils.format(widget.reimbursement.totalAmountPaise),
-                        style: theme.textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.paidBadge,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Total payout for ${expenses.length} item(s)',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      if (widget.reimbursement.notes != null &&
-                          widget.reimbursement.notes!.isNotEmpty) ...[
-                        const SizedBox(height: 12),
-                        Divider(color: AppColors.paidBadge.withOpacity(0.2)),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            const Icon(Icons.notes_rounded, size: 16, color: AppColors.paidBadge),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                widget.reimbursement.notes!,
-                                style: theme.textTheme.bodySmall?.copyWith(fontStyle: FontStyle.italic),
+                            Text(
+                              AppDateUtils.toDisplay(widget.reimbursement.datePaid),
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
                         ),
-                      ],
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 18),
-
-                // Export Button Card
-                FilledButton.icon(
-                  onPressed: _isGeneratingPdf ? null : _exportPdf,
-                  icon: const Icon(Icons.picture_as_pdf_rounded),
-                  label: Text(_isGeneratingPdf ? 'Generating PDF...' : 'Share Formal PDF Voucher'),
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Itemized List
-                Text(
-                  'Itemized Out-of-Pocket Expenses',
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 12),
-                ListView.separated(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: expenses.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
-                  itemBuilder: (context, index) {
-                    final item = expenses[index];
-                    final receipts = _receiptsMap[item.expense.id] ?? [];
-
-                    return Card(
-                      elevation: 0.5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        side: BorderSide(color: theme.dividerColor.withOpacity(0.1)),
-                      ),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(14),
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => ExpenseDetailScreen.fromView(item),
+                        const SizedBox(height: 14),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            Text(
+                              '₹ ',
+                              style: AppTypography.spaceGrotesk(
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.onSurface,
+                              ),
                             ),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(14),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            Text(
+                              CurrencyUtils.format(widget.reimbursement.totalAmountPaise).replaceAll('₹', '').trim(),
+                              style: AppTypography.ndot(
+                                fontSize: 32,
+                                fontWeight: FontWeight.w800,
+                                color: theme.colorScheme.onSurface,
+                                letterSpacing: 1.0,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Total payout for ${expenses.length} item(s)',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        if (widget.reimbursement.notes != null &&
+                            widget.reimbursement.notes!.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          Divider(color: theme.dividerColor, height: 1),
+                          const SizedBox(height: 8),
+                          Row(
                             children: [
-                              Row(
-                                children: [
-                                  CategoryIconBadge(
-                                    iconKey: item.categoryIcon,
-                                    size: 40,
-                                    iconSize: 20,
-                                    borderRadius: 10,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          item.categoryName,
-                                          style: const TextStyle(fontWeight: FontWeight.bold),
-                                        ),
-                                        Text(
-                                          '${item.matterTitle} • ${AppDateUtils.toDisplay(item.expense.expenseDate)}',
-                                          style: theme.textTheme.bodySmall?.copyWith(
-                                            color: theme.colorScheme.onSurfaceVariant,
-                                          ),
-                                        ),
-                                      ],
+                              Icon(Icons.notes_rounded, size: 16, color: theme.colorScheme.onSurfaceVariant),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  widget.reimbursement.notes!,
+                                  style: theme.textTheme.bodySmall?.copyWith(fontStyle: FontStyle.italic),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Export Button Card
+                  FilledButton.icon(
+                    onPressed: _isGeneratingPdf ? null : _exportPdf,
+                    icon: const Icon(Icons.picture_as_pdf_rounded),
+                    label: Text(_isGeneratingPdf ? 'Generating PDF...' : 'Share Formal PDF Voucher'),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Itemized List
+                  Text(
+                    'Itemized Out-of-Pocket Expenses',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: expenses.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    itemBuilder: (context, index) {
+                      final item = expenses[index];
+                      final receipts = _receiptsMap[item.expense.id] ?? [];
+
+                      return Card(
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                          side: BorderSide(color: theme.dividerColor, width: 0.8),
+                        ),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(6),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => ExpenseDetailScreen.fromView(item),
+                              ),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(14),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    CategoryIconBadge(
+                                      iconKey: item.categoryIcon,
+                                      size: 38,
+                                      iconSize: 18,
+                                      borderRadius: 6,
                                     ),
-                                  ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            item.categoryName,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: -0.2,
+                                            ),
+                                          ),
+                                          Text(
+                                            '${item.matterTitle} • ${AppDateUtils.toDisplay(item.expense.expenseDate)}',
+                                            style: theme.textTheme.bodySmall?.copyWith(
+                                              color: theme.colorScheme.onSurfaceVariant,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Text(
+                                      CurrencyUtils.format(item.expense.amountPaise),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                        color: theme.colorScheme.onSurface,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                if (item.expense.notes != null && item.expense.notes!.isNotEmpty) ...[
+                                  const SizedBox(height: 8),
                                   Text(
-                                    CurrencyUtils.format(item.expense.amountPaise),
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                      color: theme.colorScheme.primary,
+                                    item.expense.notes!,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      fontStyle: FontStyle.italic,
+                                      color: theme.colorScheme.onSurfaceVariant,
                                     ),
                                   ),
                                 ],
-                              ),
-                              if (item.expense.notes != null && item.expense.notes!.isNotEmpty) ...[
-                                const SizedBox(height: 8),
-                                Text(
-                                  item.expense.notes!,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    fontStyle: FontStyle.italic,
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                              // Receipts thumbnail strip
-                              if (receipts.isNotEmpty) ...[
-                                const SizedBox(height: 10),
-                                SizedBox(
-                                  height: 50,
-                                  child: ListView.separated(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: receipts.length,
-                                    separatorBuilder: (_, __) => const SizedBox(width: 8),
-                                    itemBuilder: (context, rIdx) {
-                                      final receipt = receipts[rIdx];
-                                      return FutureBuilder<File>(
-                                        future: receiptStorage.getReceiptFile(receipt.fileName),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.hasData && snapshot.data!.existsSync()) {
-                                            return GestureDetector(
-                                              onTap: () => _showImageDialog(
-                                                snapshot.data!,
-                                                'Receipt for ${item.matterTitle}',
-                                              ),
-                                              child: ClipRRect(
-                                                borderRadius: BorderRadius.circular(8),
-                                                child: Image.file(
+                                // Receipts thumbnail strip
+                                if (receipts.isNotEmpty) ...[
+                                  const SizedBox(height: 10),
+                                  SizedBox(
+                                    height: 50,
+                                    child: ListView.separated(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: receipts.length,
+                                      separatorBuilder: (_, __) => const SizedBox(width: 8),
+                                      itemBuilder: (context, rIdx) {
+                                        final receipt = receipts[rIdx];
+                                        return FutureBuilder<File>(
+                                          future: receiptStorage.getReceiptFile(receipt.fileName),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.hasData && snapshot.data!.existsSync()) {
+                                              return GestureDetector(
+                                                onTap: () => _showImageDialog(
                                                   snapshot.data!,
-                                                  width: 50,
-                                                  height: 50,
-                                                  fit: BoxFit.cover,
+                                                  'Receipt for ${item.matterTitle}',
                                                 ),
-                                              ),
-                                            );
-                                          }
-                                          return const SizedBox.shrink();
-                                        },
-                                      );
-                                    },
+                                                child: ClipRRect(
+                                                  borderRadius: BorderRadius.circular(4),
+                                                  child: Image.file(
+                                                    snapshot.data!,
+                                                    width: 50,
+                                                    height: 50,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                            return const SizedBox.shrink();
+                                          },
+                                        );
+                                      },
+                                    ),
                                   ),
-                                ),
+                                ],
                               ],
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 30),
-              ],
-            ),
-          );
-        },
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 30),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

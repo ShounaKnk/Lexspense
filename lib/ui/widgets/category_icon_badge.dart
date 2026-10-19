@@ -16,7 +16,7 @@ class CategoryIconBadge extends StatelessWidget {
     required this.iconKey,
     this.size = 44,
     this.iconSize = 22,
-    this.borderRadius = 12,
+    this.borderRadius = 6,
     this.customColor,
     this.customBgColor,
   });
@@ -26,6 +26,7 @@ class CategoryIconBadge extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final color = customColor ?? IconMap.colorFor(iconKey, isDark: isDark);
     final bgColor = customBgColor ?? IconMap.backgroundFor(iconKey, isDark: isDark);
+    final borderColor = isDark ? const Color(0xFF2E2E32) : const Color(0xFFDCDCE2);
     final iconData = IconMap.fromKey(iconKey);
 
     return Container(
@@ -34,6 +35,7 @@ class CategoryIconBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(color: borderColor, width: 1.0),
       ),
       child: Center(
         child: Icon(

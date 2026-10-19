@@ -14,6 +14,7 @@ import 'widgets/amount_input.dart';
 import 'widgets/category_picker.dart';
 import 'widgets/matter_picker.dart';
 import 'widgets/receipt_capture.dart';
+import '../../widgets/dot_matrix_background.dart';
 
 class AddExpenseScreen extends ConsumerStatefulWidget {
   final bool fromWidget;
@@ -224,168 +225,176 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
     final categoriesAsync = ref.watch(activeCategoriesProvider);
     final theme = Theme.of(context);
 
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Log Out-of-Pocket Expense'),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // 1. Amount
-              Text(
-                'AMOUNT SPENT',
-                style: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.1,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              AmountInput(controller: _amountController),
-              const SizedBox(height: 24),
-
-              // 2. Matter
-              Text(
-                'CLIENT MATTER / CASE',
-                style: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.1,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              mattersAsync.when(
-                loading: () => const LinearProgressIndicator(),
-                error: (e, _) => Text('Error loading matters: $e'),
-                data: (matters) => MatterPicker(
-                  matters: matters,
-                  selectedMatterId: _selectedMatterId,
-                  onMatterSelected: (id) => setState(() => _selectedMatterId = id),
-                  onQuickAddMatter: _showQuickAddMatterDialog,
-                ),
-              ),
-              const SizedBox(height: 18),
-
-              // 3. Category
-              Text(
-                'EXPENSE CATEGORY',
-                style: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.1,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              categoriesAsync.when(
-                loading: () => const LinearProgressIndicator(),
-                error: (e, _) => Text('Error loading categories: $e'),
-                data: (categories) {
-                  // Preselect first if not selected
-                  if (_selectedCategoryId == null && categories.isNotEmpty) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if (mounted && _selectedCategoryId == null) {
-                        setState(() => _selectedCategoryId = categories.first.id);
-                      }
-                    });
-                  }
-                  return CategoryPicker(
-                    categories: categories,
-                    selectedCategoryId: _selectedCategoryId,
-                    onCategorySelected: (id) => setState(() => _selectedCategoryId = id),
-                  );
-                },
-              ),
-              const SizedBox(height: 24),
-
-              // 4. Date
-              Text(
-                'EXPENSE DATE',
-                style: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.1,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              InkWell(
-                onTap: _pickDate,
-                borderRadius: BorderRadius.circular(14),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: theme.dividerColor.withOpacity(0.3)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.calendar_today_rounded, size: 20),
-                      const SizedBox(width: 12),
-                      Text(
-                        AppDateUtils.toDisplay(AppDateUtils.toDbString(_selectedDate)),
-                        style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
-                      ),
-                      const Spacer(),
-                      const Icon(Icons.arrow_drop_down_rounded),
-                    ],
+      body: DotMatrixBackground(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // 1. Amount
+                Text(
+                  'AMOUNT SPENT',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.1,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
+                const SizedBox(height: 8),
+                AmountInput(controller: _amountController),
+                const SizedBox(height: 24),
 
-              // 5. Notes
-              Text(
-                'NOTES & DESCRIPTION (OPTIONAL)',
-                style: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.1,
-                  color: theme.colorScheme.primary,
+                // 2. Matter
+                Text(
+                  'CLIENT MATTER / CASE',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.1,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _notesController,
-                textCapitalization: TextCapitalization.sentences,
-                decoration: InputDecoration(
-                  hintText: 'Enter description',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                const SizedBox(height: 8),
+                mattersAsync.when(
+                  loading: () => const LinearProgressIndicator(),
+                  error: (e, _) => Text('Error loading matters: $e'),
+                  data: (matters) => MatterPicker(
+                    matters: matters,
+                    selectedMatterId: _selectedMatterId,
+                    onMatterSelected: (id) => setState(() => _selectedMatterId = id),
+                    onQuickAddMatter: _showQuickAddMatterDialog,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
+                const SizedBox(height: 18),
 
-              // 6. Receipts
-              ReceiptCapture(
-                receiptFiles: _receiptImages,
-                onImageAdded: (file) => setState(() => _receiptImages.add(file)),
-                onImageRemoved: (index) => setState(() => _receiptImages.removeAt(index)),
-              ),
-              const SizedBox(height: 36),
+                // 3. Category
+                Text(
+                  'EXPENSE CATEGORY',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.1,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                categoriesAsync.when(
+                  loading: () => const LinearProgressIndicator(),
+                  error: (e, _) => Text('Error loading categories: $e'),
+                  data: (categories) {
+                    // Preselect first if not selected
+                    if (_selectedCategoryId == null && categories.isNotEmpty) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (mounted && _selectedCategoryId == null) {
+                          setState(() => _selectedCategoryId = categories.first.id);
+                        }
+                      });
+                    }
+                    return CategoryPicker(
+                      categories: categories,
+                      selectedCategoryId: _selectedCategoryId,
+                      onCategorySelected: (id) => setState(() => _selectedCategoryId = id),
+                    );
+                  },
+                ),
+                const SizedBox(height: 24),
 
-              // Save Button
-              ElevatedButton.icon(
-                onPressed: _isSaving ? null : _saveExpense,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: Colors.white,
+                // 4. Date
+                Text(
+                  'EXPENSE DATE',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.1,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
-                icon: _isSaving
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                      )
-                    : const Icon(Icons.save_rounded),
-                label: Text(
-                  _isSaving ? 'Saving...' : 'Save Expense',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                const SizedBox(height: 8),
+                InkWell(
+                  onTap: _pickDate,
+                  borderRadius: BorderRadius.circular(6),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF121216) : Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: theme.dividerColor, width: 0.8),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.calendar_today_rounded, size: 18, color: theme.colorScheme.onSurface),
+                        const SizedBox(width: 12),
+                        Text(
+                          AppDateUtils.toDisplay(AppDateUtils.toDbString(_selectedDate)),
+                          style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+                        ),
+                        const Spacer(),
+                        const Icon(Icons.arrow_drop_down_rounded),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-            ],
+                const SizedBox(height: 24),
+
+                // 5. Notes
+                Text(
+                  'NOTES & DESCRIPTION (OPTIONAL)',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.1,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _notesController,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: InputDecoration(
+                    hintText: 'Enter description',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // 6. Receipts
+                ReceiptCapture(
+                  receiptFiles: _receiptImages,
+                  onImageAdded: (file) => setState(() => _receiptImages.add(file)),
+                  onImageRemoved: (index) => setState(() => _receiptImages.removeAt(index)),
+                ),
+                const SizedBox(height: 36),
+
+                // Save Button
+                ElevatedButton.icon(
+                  onPressed: _isSaving ? null : _saveExpense,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                  ),
+                  icon: _isSaving
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: theme.colorScheme.onPrimary,
+                          ),
+                        )
+                      : const Icon(Icons.save_rounded),
+                  label: Text(
+                    _isSaving ? 'Saving...' : 'Save Expense',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),

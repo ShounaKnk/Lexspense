@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../providers/settings_provider.dart';
 import '../../../providers/import_provider.dart';
+import '../../widgets/dot_matrix_background.dart';
 import '../matters/matters_screen.dart';
 import '../forums/forums_screen.dart';
 import 'category_management_screen.dart';
@@ -82,24 +82,34 @@ class SettingsScreen extends ConsumerWidget {
     ThemeData theme,
     LawyerProfile profile,
   ) {
+    final isDark = theme.brightness == Brightness.dark;
+
     return Card(
-      elevation: 0.5,
+      elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.primary.withOpacity(0.2)),
+        borderRadius: BorderRadius.circular(6),
+        side: BorderSide(color: theme.dividerColor, width: 0.8),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
             Container(
-              width: 52,
-              height: 52,
+              width: 50,
+              height: 50,
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(16),
+                color: isDark ? const Color(0xFF1E1E22) : const Color(0xFFECECEF),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF2E2E34) : const Color(0xFFD6D6DC),
+                  width: 0.8,
+                ),
               ),
-              child: Icon(Icons.person_rounded, color: theme.colorScheme.primary, size: 28),
+              child: Icon(
+                Icons.person_rounded,
+                color: isDark ? Colors.white : Colors.black,
+                size: 26,
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -110,6 +120,7 @@ class SettingsScreen extends ConsumerWidget {
                     profile.lawyerName,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
+                      letterSpacing: -0.2,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -124,7 +135,7 @@ class SettingsScreen extends ConsumerWidget {
                     'Printed on generated PDF vouchers',
                     style: TextStyle(
                       fontSize: 11,
-                      color: theme.colorScheme.primary,
+                      color: theme.colorScheme.onSurfaceVariant,
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -146,254 +157,225 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(settingsProvider);
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    Widget buildIconBadge(IconData icon) {
+      return Container(
+        width: 38,
+        height: 38,
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E1E22) : const Color(0xFFECECEF),
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            color: isDark ? const Color(0xFF2E2E34) : const Color(0xFFD6D6DC),
+            width: 0.8,
+          ),
+        ),
+        child: Icon(
+          icon,
+          color: isDark ? Colors.white : Colors.black,
+          size: 18,
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings & Profile'),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // Profile Card
-          profileAsync.when(
-            loading: () => const LinearProgressIndicator(),
-            error: (_, __) => _buildProfileCard(context, ref, theme, const LawyerProfile()),
-            data: (profile) => _buildProfileCard(context, ref, theme, profile),
-          ),
-          const SizedBox(height: 20),
-
-          // Section Header
-          Text(
-            'DATA & CATEGORIES',
-            style: theme.textTheme.labelMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.1,
-              color: theme.colorScheme.primary,
+      body: DotMatrixBackground(
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            // Profile Card
+            profileAsync.when(
+              loading: () => const LinearProgressIndicator(),
+              error: (_, __) => _buildProfileCard(context, ref, theme, const LawyerProfile()),
+              data: (profile) => _buildProfileCard(context, ref, theme, profile),
             ),
-          ),
-          const SizedBox(height: 8),
+            const SizedBox(height: 20),
 
-          Card(
-            elevation: 0.5,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: theme.dividerColor.withOpacity(0.1)),
+            // Section Header
+            Text(
+              'DATA & CATEGORIES',
+              style: theme.textTheme.labelMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.1,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
-            child: Column(
-              children: [
-                ListTile(
-                  leading: Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      Icons.business_center_rounded,
-                      color: theme.colorScheme.primary,
-                      size: 20,
-                    ),
+            const SizedBox(height: 8),
+
+            Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+                side: BorderSide(color: theme.dividerColor, width: 0.8),
+              ),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: buildIconBadge(Icons.business_center_rounded),
+                    title: const Text('Client Matters & Cases', style: TextStyle(fontWeight: FontWeight.w600)),
+                    subtitle: const Text('Manage case titles and forums'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const MattersScreen()),
+                      );
+                    },
                   ),
-                  title: const Text('Client Matters & Cases'),
-                  subtitle: const Text('Manage case titles and forums'),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const MattersScreen()),
-                    );
-                  },
-                ),
-                Divider(height: 1, indent: 56, color: theme.dividerColor.withOpacity(0.1)),
-                ListTile(
-                  leading: Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF00897B).withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.account_balance_rounded,
-                      color: Color(0xFF00897B),
-                      size: 20,
-                    ),
+                  Divider(height: 1, indent: 56, color: theme.dividerColor),
+                  ListTile(
+                    leading: buildIconBadge(Icons.account_balance_rounded),
+                    title: const Text('Courts & Forums', style: TextStyle(fontWeight: FontWeight.w600)),
+                    subtitle: const Text('Manage courts, tribunals, and forums'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const ForumsScreen()),
+                      );
+                    },
                   ),
-                  title: const Text('Courts & Forums'),
-                  subtitle: const Text('Manage courts, tribunals, and forums'),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const ForumsScreen()),
-                    );
-                  },
-                ),
-                Divider(height: 1, indent: 56, color: theme.dividerColor.withOpacity(0.1)),
-                ListTile(
-                  leading: Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF8E24AA).withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.category_rounded,
-                      color: Color(0xFF8E24AA),
-                      size: 20,
-                    ),
+                  Divider(height: 1, indent: 56, color: theme.dividerColor),
+                  ListTile(
+                    leading: buildIconBadge(Icons.category_rounded),
+                    title: const Text('Expense Categories', style: TextStyle(fontWeight: FontWeight.w600)),
+                    subtitle: const Text('Customize categories and icons'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const CategoryManagementScreen()),
+                      );
+                    },
                   ),
-                  title: const Text('Expense Categories'),
-                  subtitle: const Text('Customize categories and icons'),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const CategoryManagementScreen()),
-                    );
-                  },
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-          // Import Section
-          Text(
-            'DATA IMPORT & SPREADSHEETS',
-            style: theme.textTheme.labelMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.1,
-              color: theme.colorScheme.primary,
+            // Import Section
+            Text(
+              'DATA IMPORT & SPREADSHEETS',
+              style: theme.textTheme.labelMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.1,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
+            const SizedBox(height: 8),
 
-          Card(
-            elevation: 0.5,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: theme.dividerColor.withOpacity(0.1)),
-            ),
-            child: Column(
-              children: [
-                ListTile(
-                  leading: Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2E7D32).withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.upload_file_rounded,
-                      color: Color(0xFF2E7D32),
-                      size: 20,
-                    ),
+            Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+                side: BorderSide(color: theme.dividerColor, width: 0.8),
+              ),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: buildIconBadge(Icons.upload_file_rounded),
+                    title: const Text('Import from Excel', style: TextStyle(fontWeight: FontWeight.w600)),
+                    subtitle: const Text('Upload expense records from spreadsheet (.xlsx)'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => showImportBottomSheet(context),
                   ),
-                  title: const Text('Import from Excel'),
-                  subtitle: const Text('Upload expense records from spreadsheet (.xlsx)'),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  onTap: () => showImportBottomSheet(context),
-                ),
-                Divider(height: 1, indent: 56, color: theme.dividerColor.withOpacity(0.1)),
-                ListTile(
-                  leading: Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0288D1).withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.download_rounded,
-                      color: Color(0xFF0288D1),
-                      size: 20,
-                    ),
+                  Divider(height: 1, indent: 56, color: theme.dividerColor),
+                  ListTile(
+                    leading: buildIconBadge(Icons.download_rounded),
+                    title: const Text('Download Sample Template', style: TextStyle(fontWeight: FontWeight.w600)),
+                    subtitle: const Text('Get official Excel spreadsheet template'),
+                    trailing: const Icon(Icons.download_rounded),
+                    onTap: () => _downloadTemplate(context, ref),
                   ),
-                  title: const Text('Download Sample Template'),
-                  subtitle: const Text('Get official Excel spreadsheet template'),
-                  trailing: const Icon(Icons.download_rounded),
-                  onTap: () => _downloadTemplate(context, ref),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Privacy Card
+            Text(
+              'PRIVACY & SECURITY',
+              style: theme.textTheme.labelMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.1,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF121216) : Colors.white,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF28282E) : const Color(0xFF1A1A1E),
+                  width: 1.0,
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Privacy Card
-          Text(
-            'PRIVACY & SECURITY',
-            style: theme.textTheme.labelMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.1,
-              color: theme.colorScheme.primary,
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.paidBadge.withOpacity(0.08),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.paidBadge.withOpacity(0.2)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.security_rounded, color: AppColors.paidBadge, size: 22),
-                    const SizedBox(width: 8),
-                    Text(
-                      '100% Offline & Private',
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.paidBadge,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.security_rounded,
+                        color: isDark ? Colors.white : Colors.black,
+                        size: 20,
                       ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '100% Offline & Private',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    '• Zero network permissions in manifest\n'
+                    '• All legal records stored in local SQLite database\n'
+                    '• Receipt photos encrypted in app-private storage\n'
+                    '• Never uploads client matters or financial data to cloud servers',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      height: 1.6,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '• Zero network permissions in manifest\n'
-                  '• All legal records stored in local SQLite database\n'
-                  '• Receipt photos encrypted in app-private storage\n'
-                  '• Never uploads client matters or financial data to cloud servers',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    height: 1.5,
-                    color: theme.colorScheme.onSurfaceVariant,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
-          // About section
-          Center(
-            child: Column(
-              children: [
-                Text(
-                  'Lexspense v1.0.0',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurfaceVariant,
+            // About section
+            Center(
+              child: Column(
+                children: [
+                  Text(
+                    'Lexspense v1.0.0',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'Open Source • MIT License',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontSize: 11,
-                    color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Advocate Ledger • High-Contrast Legal Edition',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontSize: 11,
+                      color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 24),
-        ],
+            const SizedBox(height: 24),
+          ],
+        ),
       ),
     );
   }

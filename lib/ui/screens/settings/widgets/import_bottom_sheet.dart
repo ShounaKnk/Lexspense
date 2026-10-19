@@ -41,7 +41,7 @@ class _ImportBottomSheetState extends ConsumerState<ImportBottomSheet> {
     return Container(
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
       ),
       padding: EdgeInsets.only(
         top: 12,
@@ -99,13 +99,17 @@ class _ImportBottomSheetState extends ConsumerState<ImportBottomSheet> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: const Color(0xFF2E7D32).withOpacity(0.12),
-                borderRadius: BorderRadius.circular(14),
+                color: isDark ? const Color(0xFF1E1E22) : const Color(0xFFECECEF),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF2E2E34) : const Color(0xFFD6D6DC),
+                  width: 0.8,
+                ),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.upload_file_rounded,
-                color: Color(0xFF2E7D32),
-                size: 24,
+                color: isDark ? Colors.white : Colors.black,
+                size: 22,
               ),
             ),
             const SizedBox(width: 14),
@@ -117,6 +121,7 @@ class _ImportBottomSheetState extends ConsumerState<ImportBottomSheet> {
                     'Import Expenses',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
+                      letterSpacing: -0.2,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -137,9 +142,9 @@ class _ImportBottomSheetState extends ConsumerState<ImportBottomSheet> {
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: theme.dividerColor.withOpacity(0.1)),
+            color: isDark ? const Color(0xFF121216) : Colors.white,
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: theme.dividerColor, width: 0.8),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,7 +153,8 @@ class _ImportBottomSheetState extends ConsumerState<ImportBottomSheet> {
                 'Supported Columns in Row 1:',
                 style: theme.textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.primary,
+                  letterSpacing: 0.5,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 8),
@@ -193,16 +199,19 @@ class _ImportBottomSheetState extends ConsumerState<ImportBottomSheet> {
         // Action Buttons
         FilledButton.icon(
           icon: state.status == ImportStatus.picking
-              ? const SizedBox(
+              ? SizedBox(
                   width: 18,
                   height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: theme.colorScheme.onPrimary,
+                  ),
                 )
               : const Icon(Icons.file_open_rounded),
           label: Text(state.status == ImportStatus.picking ? 'Selecting File…' : 'Select Excel File (.xlsx / .xls)'),
           style: FilledButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 14),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
           ),
           onPressed: state.status == ImportStatus.picking
               ? null
@@ -215,7 +224,7 @@ class _ImportBottomSheetState extends ConsumerState<ImportBottomSheet> {
           label: const Text('Download Sample Template'),
           style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 12),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
           ),
           onPressed: () async {
             final path = await ref.read(importProvider.notifier).downloadTemplate();
@@ -326,6 +335,7 @@ class _ImportBottomSheetState extends ConsumerState<ImportBottomSheet> {
   ) {
     final result = state.result;
     if (result == null) return const SizedBox.shrink();
+    final isDark = theme.brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -367,17 +377,18 @@ class _ImportBottomSheetState extends ConsumerState<ImportBottomSheet> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceVariant.withOpacity(0.4),
-            borderRadius: BorderRadius.circular(14),
+            color: isDark ? const Color(0xFF121216) : Colors.white,
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: theme.dividerColor, width: 0.8),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildStatItem('Imported', '${result.imported}', AppColors.paidBadge, theme),
-              Container(width: 1, height: 32, color: theme.dividerColor.withOpacity(0.2)),
+              _buildStatItem('Imported', '${result.imported}', isDark ? Colors.white : Colors.black, theme),
+              Container(width: 1, height: 32, color: theme.dividerColor),
               _buildStatItem('Skipped', '${result.skipped}', theme.colorScheme.error, theme),
-              Container(width: 1, height: 32, color: theme.dividerColor.withOpacity(0.2)),
-              _buildStatItem('Total Rows', '${result.totalRows}', theme.colorScheme.primary, theme),
+              Container(width: 1, height: 32, color: theme.dividerColor),
+              _buildStatItem('Total Rows', '${result.totalRows}', theme.colorScheme.onSurface, theme),
             ],
           ),
         ),
@@ -387,7 +398,7 @@ class _ImportBottomSheetState extends ConsumerState<ImportBottomSheet> {
         if (result.hasWarnings) ...[
           InkWell(
             onTap: () => setState(() => _showWarnings = !_showWarnings),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(4),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
               child: Row(
@@ -425,7 +436,7 @@ class _ImportBottomSheetState extends ConsumerState<ImportBottomSheet> {
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: theme.colorScheme.error.withOpacity(0.06),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(6),
                 border: Border.all(color: theme.colorScheme.error.withOpacity(0.2)),
               ),
               child: ListView.separated(
@@ -450,7 +461,7 @@ class _ImportBottomSheetState extends ConsumerState<ImportBottomSheet> {
         FilledButton(
           style: FilledButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 14),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
           ),
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Done'),
@@ -516,7 +527,7 @@ class _ImportBottomSheetState extends ConsumerState<ImportBottomSheet> {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: theme.colorScheme.error.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(6),
             border: Border.all(color: theme.colorScheme.error.withOpacity(0.2)),
           ),
           child: Text(
@@ -535,7 +546,7 @@ class _ImportBottomSheetState extends ConsumerState<ImportBottomSheet> {
           label: const Text('Download Official Template'),
           style: FilledButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 12),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
           ),
           onPressed: () async {
             final path = await ref.read(importProvider.notifier).downloadTemplate();
@@ -558,7 +569,7 @@ class _ImportBottomSheetState extends ConsumerState<ImportBottomSheet> {
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
                 child: const Text('Dismiss'),
@@ -569,7 +580,7 @@ class _ImportBottomSheetState extends ConsumerState<ImportBottomSheet> {
               child: FilledButton(
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                 ),
                 onPressed: () => ref.read(importProvider.notifier).pickAndImport(),
                 child: const Text('Try Again'),

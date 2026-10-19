@@ -27,18 +27,18 @@ class ExpenseListTile extends StatelessWidget {
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-      elevation: isSelected ? 3 : 0.5,
+      elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(6),
         side: BorderSide(
           color: isSelected
-              ? theme.colorScheme.primary
-              : theme.dividerColor.withOpacity(0.08),
-          width: isSelected ? 1.8 : 1,
+              ? (theme.brightness == Brightness.dark ? Colors.white : Colors.black)
+              : theme.dividerColor,
+          width: isSelected ? 1.5 : 1.0,
         ),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(6),
         onTap: onTap,
         onLongPress: () => onSelected(!isSelected),
         child: Padding(
@@ -47,12 +47,12 @@ class ExpenseListTile extends StatelessWidget {
             children: [
               // Selection Checkbox
               Transform.scale(
-                scale: 1.1,
+                scale: 1.0,
                 child: Checkbox(
                   value: isSelected,
                   onChanged: onSelected,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
+                    borderRadius: BorderRadius.circular(3),
                   ),
                 ),
               ),
@@ -61,9 +61,9 @@ class ExpenseListTile extends StatelessWidget {
               // Category Icon Badge
               CategoryIconBadge(
                 iconKey: expenseView.categoryIcon,
-                size: 44,
-                iconSize: 22,
-                borderRadius: 12,
+                size: 42,
+                iconSize: 20,
+                borderRadius: 6,
               ),
               const SizedBox(width: 14),
 

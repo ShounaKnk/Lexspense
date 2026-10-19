@@ -33,28 +33,34 @@ class CategoryPicker extends StatelessWidget {
         final iconData = IconMap.fromKey(cat.icon);
 
         final isDark = theme.brightness == Brightness.dark;
-        final catColor = IconMap.colorFor(cat.icon, isDark: isDark);
-        final catBg = IconMap.backgroundFor(cat.icon, isDark: isDark);
 
         return FilterChip(
           selected: isSelected,
           avatar: Icon(
             iconData,
-            size: 18,
-            color: isSelected ? Colors.white : catColor,
+            size: 16,
+            color: isSelected
+                ? (isDark ? Colors.black : Colors.white)
+                : (isDark ? Colors.white : Colors.black),
           ),
           label: Text(cat.name),
           labelStyle: TextStyle(
-            color: isSelected ? Colors.white : theme.colorScheme.onSurface,
+            color: isSelected
+                ? (isDark ? Colors.black : Colors.white)
+                : (isDark ? Colors.white : Colors.black),
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            fontSize: 13,
           ),
-          backgroundColor: catBg,
-          selectedColor: catColor,
-          checkmarkColor: Colors.white,
+          backgroundColor: isDark ? const Color(0xFF1E1E22) : const Color(0xFFECECEF),
+          selectedColor: isDark ? Colors.white : Colors.black,
+          showCheckmark: false,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(4),
             side: BorderSide(
-              color: isSelected ? catColor : catColor.withOpacity(0.3),
+              color: isSelected
+                  ? (isDark ? Colors.white : Colors.black)
+                  : (isDark ? const Color(0xFF2E2E34) : const Color(0xFFD6D6DC)),
+              width: 0.8,
             ),
           ),
           onSelected: (_) {

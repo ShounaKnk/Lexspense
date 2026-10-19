@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../data/models/court_forum.dart';
 import '../../../providers/database_provider.dart';
 import '../../../providers/forum_provider.dart';
+import '../../widgets/dot_matrix_background.dart';
 
 class ForumsScreen extends ConsumerStatefulWidget {
   const ForumsScreen({super.key});
@@ -131,161 +132,168 @@ class _ForumsScreenState extends ConsumerState<ForumsScreen> {
     final allForumsAsync = ref.watch(allForumsProvider);
     final theme = Theme.of(context);
 
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Courts & Forums'),
       ),
-      body: Column(
-        children: [
-          // Filter Chips
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                ChoiceChip(
-                  label: const Text('Active'),
-                  selected: _filter == 'Active',
-                  onSelected: (_) => setState(() => _filter = 'Active'),
-                ),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text('Archived'),
-                  selected: _filter == 'Archived',
-                  onSelected: (_) => setState(() => _filter = 'Archived'),
-                ),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text('All'),
-                  selected: _filter == 'All',
-                  onSelected: (_) => setState(() => _filter = 'All'),
-                ),
-              ],
+      body: DotMatrixBackground(
+        child: Column(
+          children: [
+            // Filter Chips
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  ChoiceChip(
+                    label: const Text('Active'),
+                    selected: _filter == 'Active',
+                    onSelected: (_) => setState(() => _filter = 'Active'),
+                  ),
+                  const SizedBox(width: 8),
+                  ChoiceChip(
+                    label: const Text('Archived'),
+                    selected: _filter == 'Archived',
+                    onSelected: (_) => setState(() => _filter = 'Archived'),
+                  ),
+                  const SizedBox(width: 8),
+                  ChoiceChip(
+                    label: const Text('All'),
+                    selected: _filter == 'All',
+                    onSelected: (_) => setState(() => _filter = 'All'),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const Divider(height: 1),
+            Divider(height: 1, color: theme.dividerColor),
 
-          Expanded(
-            child: allForumsAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Error loading forums: $e')),
-              data: (forums) {
-                final filtered = forums.where((f) {
-                  if (_filter == 'Active') return f.status == 'Active';
-                  if (_filter == 'Archived') return f.status == 'Archived';
-                  return true;
-                }).toList();
+            Expanded(
+              child: allForumsAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Center(child: Text('Error loading forums: $e')),
+                data: (forums) {
+                  final filtered = forums.where((f) {
+                    if (_filter == 'Active') return f.status == 'Active';
+                    if (_filter == 'Archived') return f.status == 'Archived';
+                    return true;
+                  }).toList();
 
-                if (filtered.isEmpty) {
-                  return Center(
-                    child: Text(
-                      'No ${_filter.toLowerCase()} forums found.',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  );
-                }
-
-                return ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: filtered.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
-                  itemBuilder: (context, index) {
-                    final item = filtered[index];
-                    final isArchived = item.status == 'Archived';
-
-                    return Card(
-                      elevation: 0.5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        side: BorderSide(color: theme.dividerColor.withOpacity(0.1)),
-                      ),
-                      child: ListTile(
-                        leading: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: isArchived
-                                ? theme.dividerColor.withOpacity(0.15)
-                                : const Color(0xFF00897B).withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(
-                            Icons.account_balance_rounded,
-                            color: isArchived
-                                ? theme.colorScheme.onSurfaceVariant
-                                : const Color(0xFF00897B),
-                            size: 20,
-                          ),
-                        ),
-                        title: Text(
-                          item.name,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            decoration: isArchived ? TextDecoration.lineThrough : null,
-                          ),
-                        ),
-                        subtitle: Text(
-                          isArchived ? 'Archived' : 'Active',
-                          style: TextStyle(
-                            color: theme.colorScheme.onSurfaceVariant,
-                            fontSize: 12,
-                          ),
-                        ),
-                        trailing: PopupMenuButton<String>(
-                          onSelected: (action) {
-                            if (action == 'edit') {
-                              _showForumDialog(existingForum: item);
-                            } else if (action == 'archive') {
-                              _toggleArchive(item);
-                            } else if (action == 'delete') {
-                              _deleteForum(item);
-                            }
-                          },
-                          itemBuilder: (ctx) => [
-                            const PopupMenuItem(
-                              value: 'edit',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.edit_rounded, size: 18),
-                                  SizedBox(width: 8),
-                                  Text('Edit'),
-                                ],
-                              ),
-                            ),
-                            PopupMenuItem(
-                              value: 'archive',
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    isArchived ? Icons.unarchive_rounded : Icons.archive_rounded,
-                                    size: 18,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(isArchived ? 'Activate' : 'Archive'),
-                                ],
-                              ),
-                            ),
-                            const PopupMenuItem(
-                              value: 'delete',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.delete_outline_rounded, size: 18, color: Colors.red),
-                                  SizedBox(width: 8),
-                                  Text('Delete', style: TextStyle(color: Colors.red)),
-                                ],
-                              ),
-                            ),
-                          ],
+                  if (filtered.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No ${_filter.toLowerCase()} forums found.',
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
                     );
-                  },
-                );
-              },
+                  }
+
+                  return ListView.separated(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: filtered.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      final item = filtered[index];
+                      final isArchived = item.status == 'Archived';
+
+                      return Card(
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                          side: BorderSide(color: theme.dividerColor, width: 0.8),
+                        ),
+                        child: ListTile(
+                          leading: Container(
+                            width: 38,
+                            height: 38,
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF1E1E22) : const Color(0xFFECECEF),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: isDark ? const Color(0xFF2E2E34) : const Color(0xFFD6D6DC),
+                                width: 0.8,
+                              ),
+                            ),
+                            child: Icon(
+                              Icons.account_balance_rounded,
+                              color: isArchived
+                                  ? theme.colorScheme.onSurfaceVariant
+                                  : (isDark ? Colors.white : Colors.black),
+                              size: 18,
+                            ),
+                          ),
+                          title: Text(
+                            item.name,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: -0.2,
+                              decoration: isArchived ? TextDecoration.lineThrough : null,
+                            ),
+                          ),
+                          subtitle: Text(
+                            isArchived ? 'Archived' : 'Active',
+                            style: TextStyle(
+                              color: theme.colorScheme.onSurfaceVariant,
+                              fontSize: 12,
+                            ),
+                          ),
+                          trailing: PopupMenuButton<String>(
+                            onSelected: (action) {
+                              if (action == 'edit') {
+                                _showForumDialog(existingForum: item);
+                              } else if (action == 'archive') {
+                                _toggleArchive(item);
+                              } else if (action == 'delete') {
+                                _deleteForum(item);
+                              }
+                            },
+                            itemBuilder: (ctx) => [
+                              const PopupMenuItem(
+                                value: 'edit',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.edit_rounded, size: 18),
+                                    SizedBox(width: 8),
+                                    Text('Edit'),
+                                  ],
+                                ),
+                              ),
+                              PopupMenuItem(
+                                value: 'archive',
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      isArchived ? Icons.unarchive_rounded : Icons.archive_rounded,
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(isArchived ? 'Activate' : 'Archive'),
+                                  ],
+                                ),
+                              ),
+                              const PopupMenuItem(
+                                value: 'delete',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.delete_outline_rounded, size: 18, color: Colors.red),
+                                    SizedBox(width: 8),
+                                    Text('Delete', style: TextStyle(color: Colors.red)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showForumDialog(),
