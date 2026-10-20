@@ -1,9 +1,8 @@
 package com.lexledger.app
 
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.Context
-import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetProvider
@@ -16,21 +15,21 @@ class LexLedgerWidgetProvider : HomeWidgetProvider() {
         appWidgetIds: IntArray,
         widgetData: android.content.SharedPreferences
     ) {
+        val isNight = (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        val iconRes = if (isNight) R.drawable.widget_icon_dark else R.drawable.widget_icon_light
+
         appWidgetIds.forEach { widgetId ->
             val views = RemoteViews(context.packageName, R.layout.widget_layout).apply {
-                val pendingAmount = widgetData.getString("pending_amount", "₹ 0.00")
-                val pendingCount = widgetData.getInt("pending_count", 0)
+                setImageViewResource(R.id.widget_image, iconRes)
 
-                setTextViewText(R.id.widget_amount, pendingAmount)
-                setTextViewText(R.id.widget_count, "$pendingCount pending item(s)")
-
-                // Deep-link intent for "+ Log" button
+                // Deep-link intent to log new expense
                 val pendingIntent = HomeWidgetLaunchIntent.getActivity(
                     context,
                     MainActivity::class.java,
                     Uri.parse("lexledger://add")
                 )
-                setOnClickPendingIntent(R.id.widget_add_button, pendingIntent)
+                setOnClickPendingIntent(R.id.widget_root, pendingIntent)
+                setOnClickPendingIntent(R.id.widget_image, pendingIntent)
             }
             appWidgetManager.updateAppWidget(widgetId, views)
         }

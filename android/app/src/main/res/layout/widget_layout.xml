@@ -1,48 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1B5E20"
-    android:padding="12dp">
+    android:background="@android:color/transparent">
 
-    <TextView
-        android:id="@+id/widget_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="PENDING EXPENSES"
-        android:textColor="#C8E6C9"
-        android:textSize="10sp"
-        android:textStyle="bold" />
+    <ImageView
+        android:id="@+id/widget_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:contentDescription="Lexspense"
+        android:src="@drawable/widget_icon" />
 
-    <TextView
-        android:id="@+id/widget_amount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/widget_title"
-        android:layout_marginTop="2dp"
-        android:text="₹ 0.00"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/widget_count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/widget_amount"
-        android:text="0 pending items"
-        android:textColor="#E0E0E0"
-        android:textSize="11sp" />
-
-    <Button
-        android:id="@+id/widget_add_button"
-        android:layout_width="wrap_content"
-        android:layout_height="36dp"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:background="#2E7D32"
-        android:text="+ Log"
-        android:textColor="#FFFFFF"
-        android:textSize="12sp"
-        android:textStyle="bold" />
-</RelativeLayout>
+</FrameLayout>
