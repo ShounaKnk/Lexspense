@@ -112,7 +112,10 @@ class ReimbursementRepository {
              MIN(c.name) AS single_category_name,
              MIN(c.icon) AS single_category_icon,
              MIN(m.case_title) AS single_matter_title,
-             MIN(e.expense_date) AS single_expense_date
+             MIN(e.expense_date) AS single_expense_date,
+             GROUP_CONCAT(DISTINCT m.case_title) AS all_matter_titles,
+             GROUP_CONCAT(DISTINCT m.id) AS all_matter_ids,
+             GROUP_CONCAT(DISTINCT c.name) AS all_category_names
       FROM reimbursements r
       LEFT JOIN expenses e ON e.reimbursement_id = r.id
       LEFT JOIN expense_categories c ON e.category_id = c.id
@@ -133,7 +136,10 @@ class ReimbursementRepository {
              MIN(c.name) AS single_category_name,
              MIN(c.icon) AS single_category_icon,
              MIN(m.case_title) AS single_matter_title,
-             MIN(e.expense_date) AS single_expense_date
+             MIN(e.expense_date) AS single_expense_date,
+             GROUP_CONCAT(DISTINCT m.case_title) AS all_matter_titles,
+             GROUP_CONCAT(DISTINCT m.id) AS all_matter_ids,
+             GROUP_CONCAT(DISTINCT c.name) AS all_category_names
       FROM reimbursements r
       LEFT JOIN expenses e ON e.reimbursement_id = r.id
       LEFT JOIN expense_categories c ON e.category_id = c.id

@@ -11,6 +11,9 @@ class Reimbursement {
   final String? singleCategoryIcon;
   final String? singleMatterTitle;
   final String? singleExpenseDate;
+  final String? allMatterTitles;
+  final String? allMatterIds;
+  final String? allCategoryNames;
 
   const Reimbursement({
     this.id,
@@ -24,6 +27,9 @@ class Reimbursement {
     this.singleCategoryIcon,
     this.singleMatterTitle,
     this.singleExpenseDate,
+    this.allMatterTitles,
+    this.allMatterIds,
+    this.allCategoryNames,
   });
 
   Map<String, dynamic> toMap() => {
@@ -45,5 +51,20 @@ class Reimbursement {
         singleCategoryIcon: map['single_category_icon'] as String?,
         singleMatterTitle: map['single_matter_title'] as String?,
         singleExpenseDate: map['single_expense_date'] as String?,
+        allMatterTitles: map['all_matter_titles'] as String?,
+        allMatterIds: map['all_matter_ids']?.toString(),
+        allCategoryNames: map['all_category_names'] as String?,
       );
+
+  /// Check whether this reimbursement covers the given matter ID.
+  bool matchesMatterId(int matterId) {
+    if (allMatterIds != null && allMatterIds!.isNotEmpty) {
+      final ids = allMatterIds!
+          .split(',')
+          .map((s) => int.tryParse(s.trim()))
+          .whereType<int>();
+      return ids.contains(matterId);
+    }
+    return false;
+  }
 }
