@@ -44,6 +44,22 @@ class ReimbursementRepository {
         throw StateError('All selected expenses are already reimbursed');
       }
 
+      // Validate that datePaid is not before the expense_date of any selected expenses
+      final dateCheckResult = await txn.rawQuery(
+        'SELECT MAX(expense_date) AS max_expense_date '
+        'FROM expenses '
+        'WHERE id IN ($marks)',
+        expenseIds,
+      );
+      final maxExpenseDate = dateCheckResult.isNotEmpty
+          ? dateCheckResult.first['max_expense_date'] as String?
+          : null;
+      if (maxExpenseDate != null && datePaid.compareTo(maxExpenseDate) < 0) {
+        throw ArgumentError(
+          'Claim date ($datePaid) cannot be earlier than expense date ($maxExpenseDate)',
+        );
+      }
+
       // 2. Insert the reimbursement record.
       final id = await txn.insert('reimbursements', {
         'total_amount_paise': total,

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/icon_map.dart';
 import '../../widgets/category_icon_badge.dart';
 import '../../widgets/dot_matrix_background.dart';
+import '../../widgets/lexspense_app_bar.dart';
 import '../../../data/models/expense_category.dart';
 import '../../../providers/category_provider.dart';
 import '../../../providers/database_provider.dart';
@@ -126,15 +127,23 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Expense Categories'),
-      ),
+      appBar: const LexspenseAppBar(),
       body: DotMatrixBackground(
-        child: allCategoriesAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(child: Text('Error loading categories: $e')),
-          data: (categories) {
-            return ListView.separated(
+        child: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+              child: PageHeaderTitle(
+                title: 'Expense Categories',
+                subtitle: 'Enable or disable billing heads for expense logging',
+              ),
+            ),
+            Expanded(
+              child: allCategoriesAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Center(child: Text('Error loading categories: $e')),
+                data: (categories) {
+                  return ListView.separated(
               padding: const EdgeInsets.all(16),
               itemCount: categories.length,
               separatorBuilder: (_, __) => const SizedBox(height: 8),
@@ -180,6 +189,9 @@ class _CategoryManagementScreenState extends ConsumerState<CategoryManagementScr
           },
         ),
       ),
+    ],
+  ),
+),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddCategoryDialog,
         icon: const Icon(Icons.add_rounded),

@@ -15,6 +15,7 @@ import 'widgets/category_picker.dart';
 import 'widgets/matter_picker.dart';
 import 'widgets/receipt_capture.dart';
 import '../../widgets/dot_matrix_background.dart';
+import '../../widgets/lexspense_app_bar.dart';
 
 class AddExpenseScreen extends ConsumerStatefulWidget {
   final bool fromWidget;
@@ -233,9 +234,7 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Log Out-of-Pocket Expense'),
-      ),
+      appBar: const LexspenseAppBar(showAddButton: false),
       body: DotMatrixBackground(
         child: SafeArea(
           child: SingleChildScrollView(
@@ -243,6 +242,10 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                const PageHeaderTitle(
+                  title: 'Log Expense',
+                  subtitle: 'Record billable case expenditure with receipt',
+                ),
                 // 1. Amount
                 Text(
                   'AMOUNT SPENT',

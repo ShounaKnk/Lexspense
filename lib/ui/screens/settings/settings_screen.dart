@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../../providers/settings_provider.dart';
 import '../../../providers/import_provider.dart';
 import '../../widgets/dot_matrix_background.dart';
+import '../../widgets/lexspense_app_bar.dart';
 import '../matters/matters_screen.dart';
 import '../forums/forums_screen.dart';
 import 'category_management_screen.dart';
@@ -181,13 +182,15 @@ class SettingsScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings & Profile'),
-      ),
+      appBar: const LexspenseAppBar(),
       body: DotMatrixBackground(
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            const PageHeaderTitle(
+              title: 'Settings',
+              subtitle: 'Counsel profile, data management & preferences',
+            ),
             // Profile Card
             profileAsync.when(
               loading: () => const LinearProgressIndicator(),

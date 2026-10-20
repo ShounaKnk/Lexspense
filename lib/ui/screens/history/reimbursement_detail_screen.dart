@@ -12,6 +12,7 @@ import '../../../providers/settings_provider.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../widgets/category_icon_badge.dart';
 import '../../widgets/dot_matrix_background.dart';
+import '../../widgets/lexspense_app_bar.dart';
 import '../expense_detail/expense_detail_screen.dart';
 
 class ReimbursementDetailScreen extends ConsumerStatefulWidget {
@@ -178,13 +179,8 @@ class _ReimbursementDetailScreenState extends ConsumerState<ReimbursementDetailS
     final receiptStorage = ref.watch(receiptStorageServiceProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.reimbursement.itemCount == 1
-              ? (widget.reimbursement.singleCategoryName ?? 'Claim Details')
-              : 'Batch #RV-${widget.reimbursement.id.toString().padLeft(4, '0')}',
-        ),
-        actions: [
+      appBar: LexspenseAppBar(
+        extraActions: [
           IconButton(
             icon: _isGeneratingPdf
                 ? const SizedBox(
@@ -201,7 +197,6 @@ class _ReimbursementDetailScreenState extends ConsumerState<ReimbursementDetailS
             tooltip: 'Undo Reimbursement',
             onPressed: _isUndoing ? null : _undoReimbursement,
           ),
-          const SizedBox(width: 8),
         ],
       ),
       body: DotMatrixBackground(
@@ -216,6 +211,12 @@ class _ReimbursementDetailScreenState extends ConsumerState<ReimbursementDetailS
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  PageHeaderTitle(
+                    title: widget.reimbursement.itemCount == 1
+                        ? (widget.reimbursement.singleCategoryName ?? 'Claim Details')
+                        : 'Settlement Voucher #RV-${widget.reimbursement.id.toString().padLeft(4, '0')}',
+                    subtitle: 'Settled on ${AppDateUtils.toDisplay(widget.reimbursement.datePaid)} • ${widget.reimbursement.itemCount} items',
+                  ),
                   // Header Banner
                   Container(
                     padding: const EdgeInsets.all(20),

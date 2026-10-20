@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../providers/reimbursement_provider.dart';
 import '../../widgets/dot_matrix_background.dart';
+import '../../widgets/lexspense_app_bar.dart';
 import '../expense_detail/expense_detail_screen.dart';
 import 'reimbursement_detail_screen.dart';
 import 'widgets/reimbursement_tile.dart';
@@ -16,12 +17,21 @@ class HistoryScreen extends ConsumerWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Reimbursement History'),
-      ),
+      appBar: const LexspenseAppBar(),
       body: DotMatrixBackground(
-        child: reimbursementsAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+              child: PageHeaderTitle(
+                title: 'History',
+                subtitle: 'Past claims, settled vouchers & payment records',
+              ),
+            ),
+            Expanded(
+              child: reimbursementsAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, _) => Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -113,6 +123,9 @@ class HistoryScreen extends ConsumerWidget {
         },
       ),
     ),
-  );
+  ],
+),
+),
+);
 }
 }

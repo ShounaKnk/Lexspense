@@ -5,6 +5,7 @@ import '../../../providers/database_provider.dart';
 import '../../../providers/matter_provider.dart';
 import '../../../providers/forum_provider.dart';
 import '../../widgets/dot_matrix_background.dart';
+import '../../widgets/lexspense_app_bar.dart';
 
 class MattersScreen extends ConsumerStatefulWidget {
   const MattersScreen({super.key});
@@ -179,12 +180,17 @@ class _MattersScreenState extends ConsumerState<MattersScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Client Matters & Cases'),
-      ),
+      appBar: const LexspenseAppBar(),
       body: DotMatrixBackground(
         child: Column(
           children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+              child: PageHeaderTitle(
+                title: 'Client Matters',
+                subtitle: 'Manage legal cases, clients & associated courts',
+              ),
+            ),
             // Filter Chips
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

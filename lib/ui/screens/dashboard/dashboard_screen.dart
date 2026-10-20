@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../../../core/utils/currency_utils.dart';
+import '../../../core/utils/date_utils.dart';
 import '../../../data/models/expense_view.dart';
 import '../../../providers/database_provider.dart';
 import '../../../providers/expense_provider.dart';
@@ -15,6 +15,7 @@ import 'widgets/expense_list_tile.dart';
 import 'widgets/mark_paid_bottom_sheet.dart';
 import 'widgets/summary_header.dart';
 import '../../widgets/dot_matrix_background.dart';
+import '../../widgets/lexspense_app_bar.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -62,6 +63,17 @@ class DashboardScreen extends ConsumerWidget {
       (sum, item) => sum + item.expense.amountPaise,
     );
 
+    DateTime? maxExpenseDate;
+    for (final item in selectedExpenses) {
+      try {
+        final d = AppDateUtils.fromDbString(item.expense.expenseDate);
+        if (maxExpenseDate == null || d.isAfter(maxExpenseDate)) {
+          maxExpenseDate = d;
+        }
+      } catch (_) {}
+    }
+    final minClaimDate = maxExpenseDate ?? DateTime.now();
+
     showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
@@ -71,6 +83,7 @@ class DashboardScreen extends ConsumerWidget {
       builder: (ctx) => MarkPaidBottomSheet(
         totalPaise: totalPaise,
         count: selectedExpenses.length,
+        minClaimDate: minClaimDate,
         onConfirm: (datePaid, notes) async {
           final expenseIds = selectedExpenses.map((e) => e.expense.id!).toList();
           await ref.read(reimbursementRepositoryProvider).createReimbursement(
@@ -93,31 +106,9 @@ class DashboardScreen extends ConsumerWidget {
     final selectedIds = ref.watch(selectedExpensesProvider);
     final selectionNotifier = ref.read(selectedExpensesProvider.notifier);
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: SvgPicture.asset(
-          isDark
-              ? 'assets/images/logo_dark_mode.svg'
-              : 'assets/images/logo_light_mode.svg',
-          height: 24,
-          fit: BoxFit.contain,
-          alignment: Alignment.centerLeft,
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline_rounded, size: 24),
-            tooltip: 'Add Expense',
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const AddExpenseScreen()),
-              );
-            },
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
+      appBar: const LexspenseAppBar(),
       body: DotMatrixBackground(
         child: unpaidAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),

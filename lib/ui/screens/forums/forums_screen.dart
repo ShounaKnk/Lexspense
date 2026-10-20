@@ -4,6 +4,7 @@ import '../../../data/models/court_forum.dart';
 import '../../../providers/database_provider.dart';
 import '../../../providers/forum_provider.dart';
 import '../../widgets/dot_matrix_background.dart';
+import '../../widgets/lexspense_app_bar.dart';
 
 class ForumsScreen extends ConsumerStatefulWidget {
   const ForumsScreen({super.key});
@@ -135,12 +136,17 @@ class _ForumsScreenState extends ConsumerState<ForumsScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Courts & Forums'),
-      ),
+      appBar: const LexspenseAppBar(),
       body: DotMatrixBackground(
         child: Column(
           children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+              child: PageHeaderTitle(
+                title: 'Courts & Forums',
+                subtitle: 'Jurisdictions, tribunals & dispute forums',
+              ),
+            ),
             // Filter Chips
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

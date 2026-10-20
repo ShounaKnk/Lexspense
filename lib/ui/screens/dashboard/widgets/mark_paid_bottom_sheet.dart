@@ -6,12 +6,14 @@ import '../../../../core/utils/date_utils.dart';
 class MarkPaidBottomSheet extends StatefulWidget {
   final int totalPaise;
   final int count;
+  final DateTime minClaimDate;
   final Future<void> Function(String datePaid, String? notes) onConfirm;
 
   const MarkPaidBottomSheet({
     super.key,
     required this.totalPaise,
     required this.count,
+    required this.minClaimDate,
     required this.onConfirm,
   });
 
@@ -27,7 +29,14 @@ class _MarkPaidBottomSheetState extends State<MarkPaidBottomSheet> {
   @override
   void initState() {
     super.initState();
-    _selectedDate = DateTime.now();
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final minDate = DateTime(
+      widget.minClaimDate.year,
+      widget.minClaimDate.month,
+      widget.minClaimDate.day,
+    );
+    _selectedDate = today.isBefore(minDate) ? minDate : today;
   }
 
   @override
@@ -37,11 +46,20 @@ class _MarkPaidBottomSheetState extends State<MarkPaidBottomSheet> {
   }
 
   Future<void> _pickDate() async {
+    final now = DateTime.now();
+    final minDate = DateTime(
+      widget.minClaimDate.year,
+      widget.minClaimDate.month,
+      widget.minClaimDate.day,
+    );
+    final maxDate = DateTime(now.year + 5, 12, 31);
+    final initial = _selectedDate.isBefore(minDate) ? minDate : _selectedDate;
+
     final picked = await showDatePicker(
       context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime(2020),
-      lastDate: DateTime.now(),
+      initialDate: initial,
+      firstDate: minDate,
+      lastDate: maxDate,
     );
     if (picked != null) {
       setState(() => _selectedDate = picked);
@@ -49,6 +67,25 @@ class _MarkPaidBottomSheetState extends State<MarkPaidBottomSheet> {
   }
 
   Future<void> _submit() async {
+    final selectedDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+    final minDay = DateTime(
+      widget.minClaimDate.year,
+      widget.minClaimDate.month,
+      widget.minClaimDate.day,
+    );
+
+    if (selectedDay.isBefore(minDay)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Claim date cannot be earlier than expense date (${AppDateUtils.toDisplay(AppDateUtils.toDbString(widget.minClaimDate))})',
+          ),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isSubmitting = true);
     try {
       final dateStr = AppDateUtils.toDbString(_selectedDate);
@@ -201,6 +238,16 @@ class _MarkPaidBottomSheetState extends State<MarkPaidBottomSheet> {
               side: BorderSide(color: theme.dividerColor, width: 0.8),
             ),
             onTap: _pickDate,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 4, left: 4),
+            child: Text(
+              'Cannot be earlier than expense date: ${AppDateUtils.toDisplay(AppDateUtils.toDbString(widget.minClaimDate))}',
+              style: TextStyle(
+                fontSize: 11,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
           ),
           const SizedBox(height: 12),
 

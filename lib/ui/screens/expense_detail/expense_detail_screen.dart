@@ -11,6 +11,7 @@ import '../../../providers/expense_provider.dart';
 import '../../../providers/reimbursement_provider.dart';
 import '../../../providers/selection_provider.dart';
 import '../../widgets/dot_matrix_background.dart';
+import '../../widgets/lexspense_app_bar.dart';
 import '../dashboard/widgets/mark_paid_bottom_sheet.dart';
 import '../history/reimbursement_detail_screen.dart';
 
@@ -79,6 +80,13 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
   }
 
   void _showMarkPaidModal(ExpenseView view) {
+    DateTime minClaimDate;
+    try {
+      minClaimDate = AppDateUtils.fromDbString(view.expense.expenseDate);
+    } catch (_) {
+      minClaimDate = DateTime.now();
+    }
+
     showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
@@ -88,6 +96,7 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
       builder: (ctx) => MarkPaidBottomSheet(
         totalPaise: view.expense.amountPaise,
         count: 1,
+        minClaimDate: minClaimDate,
         onConfirm: (datePaid, notes) async {
           await ref.read(reimbursementRepositoryProvider).createReimbursement(
             expenseIds: [view.expense.id!],
@@ -169,7 +178,7 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
 
     if (expenseView == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Expense Details')),
+        appBar: const LexspenseAppBar(),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -195,9 +204,8 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Expense Details'),
-        actions: [
+      appBar: LexspenseAppBar(
+        extraActions: [
           if (!isReimbursed)
             IconButton(
               icon: const Icon(Icons.delete_outline_rounded),
@@ -211,6 +219,10 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
           children: [
+            PageHeaderTitle(
+              title: 'Expense Details',
+              subtitle: 'Case Expense #${expense.id} • ${AppDateUtils.toDisplay(expense.expenseDate)}',
+            ),
             // -------------------------------------------------------------------
             // 1. HERO AMOUNT & STATUS CARD
             // -------------------------------------------------------------------
