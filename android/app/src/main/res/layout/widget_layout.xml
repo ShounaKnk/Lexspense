@@ -13,6 +13,6 @@
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
         android:contentDescription="Lexspense"
-        android:src="@drawable/widget_icon" />
+        android:src="@drawable/widget_icon_light" />
 
 </FrameLayout>
