@@ -4,7 +4,7 @@ import 'package:lexledger/core/utils/date_utils.dart';
 void main() {
   group('Claim Date Validation Tests', () {
     test('Claim date cannot be older than expense date', () {
-      final expenseDateStr = '2026-10-20';
+      const expenseDateStr = '2026-10-20';
       final expenseDate = AppDateUtils.fromDbString(expenseDateStr);
 
       final olderClaimDate = DateTime(2026, 10, 19);

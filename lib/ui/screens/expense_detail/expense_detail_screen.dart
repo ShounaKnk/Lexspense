@@ -14,6 +14,7 @@ import '../../widgets/dot_matrix_background.dart';
 import '../../widgets/lexspense_app_bar.dart';
 import '../dashboard/widgets/mark_paid_bottom_sheet.dart';
 import '../history/reimbursement_detail_screen.dart';
+import '../add_expense/add_expense_screen.dart';
 
 class ExpenseDetailScreen extends ConsumerStatefulWidget {
   final int expenseId;
@@ -76,6 +77,19 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error deleting expense: $e')),
       );
+    }
+  }
+
+  Future<void> _editExpense(ExpenseView view) async {
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => AddExpenseScreen(expenseToEdit: view),
+      ),
+    );
+    if (result == true && mounted) {
+      ref.invalidate(singleExpenseProvider(widget.expenseId));
+      ref.invalidate(expenseReceiptsProvider(widget.expenseId));
+      ref.invalidate(unpaidExpensesProvider);
     }
   }
 
@@ -206,13 +220,19 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
     return Scaffold(
       appBar: LexspenseAppBar(
         extraActions: [
-          if (!isReimbursed)
+          if (!isReimbursed) ...[
+            IconButton(
+              icon: const Icon(Icons.edit_outlined),
+              tooltip: 'Edit Expense',
+              onPressed: () => _editExpense(expenseView),
+            ),
             IconButton(
               icon: const Icon(Icons.delete_outline_rounded),
               tooltip: 'Delete Expense',
               color: theme.colorScheme.error,
               onPressed: () => _deleteExpense(expenseView),
             ),
+          ],
         ],
       ),
       body: DotMatrixBackground(
@@ -721,30 +741,39 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
           ? Container(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
               decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor,
-                border: Border(top: BorderSide(color: theme.dividerColor, width: 0.8)),
+                 color: theme.scaffoldBackgroundColor,
+                 border: Border(top: BorderSide(color: theme.dividerColor, width: 0.8)),
               ),
               child: SafeArea(
                 child: Row(
                   children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: theme.colorScheme.error,
-                          side: BorderSide(color: theme.colorScheme.error.withOpacity(0.6)),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
+                    OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                        onPressed: () => _deleteExpense(expenseView),
-                        icon: const Icon(Icons.delete_outline_rounded, size: 20),
-                        label: const Text('Delete'),
                       ),
+                      onPressed: () => _editExpense(expenseView),
+                      icon: const Icon(Icons.edit_outlined, size: 18),
+                      label: const Text('Edit'),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 8),
+                    IconButton.outlined(
+                      style: IconButton.styleFrom(
+                        foregroundColor: theme.colorScheme.error,
+                        side: BorderSide(color: theme.colorScheme.error.withOpacity(0.5)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        padding: const EdgeInsets.all(12),
+                      ),
+                      onPressed: () => _deleteExpense(expenseView),
+                      icon: const Icon(Icons.delete_outline_rounded, size: 20),
+                      tooltip: 'Delete Expense',
+                    ),
+                    const SizedBox(width: 8),
                     Expanded(
-                      flex: 2,
                       child: FilledButton.icon(
                         style: FilledButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
@@ -754,7 +783,7 @@ class _ExpenseDetailScreenState extends ConsumerState<ExpenseDetailScreen> {
                         ),
                         onPressed: () => _showMarkPaidModal(expenseView),
                         icon: const Icon(Icons.check_circle_rounded, size: 20),
-                        label: const Text('Claim This Expense'),
+                        label: const Text('Claim Expense'),
                       ),
                     ),
                   ],

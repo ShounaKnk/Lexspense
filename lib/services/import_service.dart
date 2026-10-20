@@ -88,17 +88,17 @@ class ImportService {
     final headerRow = rows[0];
     final colMap = _mapHeaders(headerRow);
 
-    // Validate mandatory columns
+    // Validate mandatory columns: only Date, Amount, Category, Compensated
     final missing = <String>[];
     if (!colMap.containsKey('date')) missing.add('Date');
     if (!colMap.containsKey('amount')) missing.add('Amount');
     if (!colMap.containsKey('category')) missing.add('Category');
-    if (!colMap.containsKey('case')) missing.add('Case / Matter');
+    if (!colMap.containsKey('compensated')) missing.add('Compensated');
 
     if (missing.isNotEmpty) {
       throw FormatException(
         'Missing required header column(s): ${missing.join(', ')}.\n\n'
-        'Please ensure row 1 contains: Date, Amount, Category, Case (and optionally Court, Compensated, Notes).',
+        'Please ensure row 1 contains: Date, Amount, Category, Compensated (and optionally Case, Court, Notes).',
       );
     }
 
@@ -141,12 +141,12 @@ class ImportService {
       final rawDate = _getCellValue(row, colMap['date']);
       final rawAmount = _getCellValue(row, colMap['amount']);
       final rawCategory = _getCellValue(row, colMap['category']);
+      final rawCompensated = _getCellValue(row, colMap['compensated']);
       final rawCase = _getCellValue(row, colMap['case']);
       final rawCourt = _getCellValue(row, colMap['court']);
-      final rawCompensated = _getCellValue(row, colMap['compensated']);
       final rawNotes = _getCellValue(row, colMap['notes']);
 
-      // 3a. Validate Date
+      // 3a. Validate Date (Mandatory)
       final parsedDate = _parseDate(rawDate);
       if (parsedDate == null) {
         skippedCount++;
@@ -154,7 +154,7 @@ class ImportService {
         continue;
       }
 
-      // 3b. Validate Amount
+      // 3b. Validate Amount (Mandatory)
       final parsedPaise = _parsePaise(rawAmount);
       if (parsedPaise == null || parsedPaise <= 0) {
         skippedCount++;
@@ -162,30 +162,49 @@ class ImportService {
         continue;
       }
 
-      // 3c. Validate Case
-      final caseTitle = rawCase?.toString().trim();
-      if (caseTitle == null || caseTitle.isEmpty) {
-        skippedCount++;
-        warnings.add('Row $rowNumber: Case / Matter title is empty.');
-        continue;
-      }
-
-      // 3d. Validate Category
+      // 3c. Validate Category (Mandatory)
       final categoryName = rawCategory?.toString().trim();
-      if (categoryName == null || categoryName.isEmpty) {
+      if (categoryName == null ||
+          categoryName.isEmpty ||
+          categoryName.toLowerCase() == 'null' ||
+          categoryName.toLowerCase() == 'nan') {
         skippedCount++;
         warnings.add('Row $rowNumber: Category name is empty.');
         continue;
       }
 
-      final notes = rawNotes?.toString().trim();
+      // 3d. Validate Compensated (Mandatory)
       final isCompensated = _parseCompensated(rawCompensated);
+      if (isCompensated == null) {
+        skippedCount++;
+        warnings.add('Row $rowNumber: Missing or invalid Compensated value "${rawCompensated ?? ''}". Expected Yes/No or Paid/Unpaid.');
+        continue;
+      }
+
+      // Optional fields:
+      // Case / Matter (defaults to 'General' if empty/null)
+      final rawCaseStr = rawCase?.toString().trim();
+      final caseTitle = (rawCaseStr == null ||
+              rawCaseStr.isEmpty ||
+              rawCaseStr.toLowerCase() == 'null' ||
+              rawCaseStr.toLowerCase() == 'nan')
+          ? 'General'
+          : rawCaseStr;
+
+      // Notes (completely optional - null if empty or 'null')
+      final notes = _parseNotes(rawNotes);
 
       try {
-        // 4. Resolve or create Forum (if given)
+        // 4. Resolve or create Forum (if given and non-empty)
         int? forumId;
-        final courtName = rawCourt?.toString().trim();
-        if (courtName != null && courtName.isNotEmpty) {
+        final rawCourtStr = rawCourt?.toString().trim();
+        final courtName = (rawCourtStr == null ||
+                rawCourtStr.isEmpty ||
+                rawCourtStr.toLowerCase() == 'null' ||
+                rawCourtStr.toLowerCase() == 'nan')
+            ? null
+            : rawCourtStr;
+        if (courtName != null) {
           final forumKey = courtName.toLowerCase();
           if (forumMap.containsKey(forumKey)) {
             forumId = forumMap[forumKey];
@@ -292,19 +311,79 @@ class ImportService {
       final cellVal = headerRow[col]?.value?.toString().trim().toLowerCase();
       if (cellVal == null || cellVal.isEmpty) continue;
 
-      if (_isHeaderMatch(cellVal, ['date', 'expense date', 'expensedate', 'dated'])) {
+      if (_isHeaderMatch(cellVal, [
+        'date',
+        'expense date',
+        'expensedate',
+        'expense_date',
+        'dated',
+      ])) {
         map['date'] = col;
-      } else if (_isHeaderMatch(cellVal, ['amount', 'amount (rs)', 'amount (inr)', 'amount(rs)', 'cost', 'price', 'amt'])) {
+      } else if (_isHeaderMatch(cellVal, [
+        'amount',
+        'amount (rs)',
+        'amount (inr)',
+        'amount(rs)',
+        'amount(inr)',
+        'cost',
+        'price',
+        'amt',
+        'val',
+        'value',
+      ])) {
         map['amount'] = col;
-      } else if (_isHeaderMatch(cellVal, ['category', 'expense category', 'expense_category', 'cat', 'type'])) {
+      } else if (_isHeaderMatch(cellVal, [
+        'category',
+        'expense category',
+        'expense_category',
+        'cat',
+        'type',
+        'expense type',
+      ])) {
         map['category'] = col;
-      } else if (_isHeaderMatch(cellVal, ['case', 'matter', 'case title', 'case name', 'client matter', 'client', 'case / matter'])) {
-        map['case'] = col;
-      } else if (_isHeaderMatch(cellVal, ['court', 'forum', 'court/forum', 'court / forum', 'tribunal', 'court forum'])) {
-        map['court'] = col;
-      } else if (_isHeaderMatch(cellVal, ['compensated', 'reimbursed', 'is compensated', 'is_compensated', 'status', 'paid', 'is paid'])) {
+      } else if (_isHeaderMatch(cellVal, [
+        'compensated',
+        'reimbursed',
+        'is compensated',
+        'is_compensated',
+        'iscompensated',
+        'status',
+        'paid',
+        'is paid',
+        'ispaid',
+        'compensation',
+      ])) {
         map['compensated'] = col;
-      } else if (_isHeaderMatch(cellVal, ['notes', 'note', 'remark', 'remarks', 'description', 'comment'])) {
+      } else if (_isHeaderMatch(cellVal, [
+        'case',
+        'matter',
+        'case title',
+        'case name',
+        'client matter',
+        'client',
+        'case / matter',
+        'case/matter',
+      ])) {
+        map['case'] = col;
+      } else if (_isHeaderMatch(cellVal, [
+        'court',
+        'forum',
+        'court/forum',
+        'court / forum',
+        'tribunal',
+        'court forum',
+      ])) {
+        map['court'] = col;
+      } else if (_isHeaderMatch(cellVal, [
+        'notes',
+        'note',
+        'remark',
+        'remarks',
+        'description',
+        'comment',
+        'comments',
+        'details',
+      ])) {
         map['notes'] = col;
       }
     }
@@ -327,6 +406,21 @@ class ImportService {
       }
     }
     return true;
+  }
+
+  /// Safely parse optional notes. Returns null if empty, whitespace, or sentinel values.
+  String? _parseNotes(dynamic raw) {
+    if (raw == null) return null;
+    final str = raw.toString().trim();
+    if (str.isEmpty ||
+        str.toLowerCase() == 'null' ||
+        str.toLowerCase() == 'nan' ||
+        str.toLowerCase() == 'none' ||
+        str.toLowerCase() == 'undefined' ||
+        str == '-') {
+      return null;
+    }
+    return str;
   }
 
   /// Parse various date representations into 'YYYY-MM-DD'.
@@ -395,17 +489,27 @@ class ImportService {
     return (d * 100).round();
   }
 
-  /// Returns true if the cell value indicates compensated / reimbursed.
-  bool _parseCompensated(dynamic raw) {
-    if (raw == null) return false;
+  /// Returns parsed boolean if the cell value indicates compensated / reimbursed, or null if missing/invalid.
+  bool? _parseCompensated(dynamic raw) {
+    if (raw == null) return null;
+    if (raw is bool) return raw;
+    if (raw is num) {
+      if (raw == 1) return true;
+      if (raw == 0) return false;
+    }
     final str = raw.toString().trim().toLowerCase();
-    return str == 'yes' ||
-        str == 'y' ||
-        str == 'true' ||
-        str == '1' ||
-        str == 'paid' ||
-        str == 'compensated' ||
-        str == 'settled';
+    if (str.isEmpty || str == 'null' || str == 'nan') return null;
+    const truthy = {
+      'yes', 'y', 'true', '1', 'paid', 'compensated', 'settled',
+      'reimbursed', 'cleared', 'done'
+    };
+    const falsy = {
+      'no', 'n', 'false', '0', 'unpaid', 'uncompensated', 'pending',
+      'not paid', 'due', 'open'
+    };
+    if (truthy.contains(str)) return true;
+    if (falsy.contains(str)) return false;
+    return null;
   }
 
   /// Generate sample Excel workbook bytes for download/export.
@@ -424,9 +528,9 @@ class ImportService {
       'Date',
       'Amount',
       'Category',
+      'Compensated',
       'Case',
       'Court',
-      'Compensated',
       'Notes',
     ];
 
@@ -442,9 +546,9 @@ class ImportService {
       TextCellValue('15/10/2024'),
       const DoubleCellValue(250.00),
       TextCellValue('Court Fees'),
+      TextCellValue('No'),
       TextCellValue('State v. Sharma'),
       TextCellValue('High Court of Delhi'),
-      TextCellValue('No'),
       TextCellValue('Certified copy urgent fee'),
     ]);
 
@@ -453,21 +557,21 @@ class ImportService {
       TextCellValue('16/10/2024'),
       const DoubleCellValue(420.00),
       TextCellValue('Travel & Transport'),
+      TextCellValue('Yes'),
       TextCellValue('Mehta v. Union of India'),
       TextCellValue('Supreme Court of India'),
-      TextCellValue('Yes'),
       TextCellValue('Cab to Court 2'),
     ]);
 
-    // Sample Row 3: Printing
+    // Sample Row 3: Printing with optional columns omitted / empty notes
     sheet.appendRow([
       TextCellValue('18/10/2024'),
       const DoubleCellValue(180.00),
       TextCellValue('Printing & Stationery'),
-      TextCellValue('State v. Sharma'),
-      TextCellValue('High Court of Delhi'),
       TextCellValue('No'),
-      TextCellValue('Paperbook printouts 60 pages'),
+      TextCellValue('General'),
+      TextCellValue(''),
+      TextCellValue(''),
     ]);
 
     return excel.encode()!;

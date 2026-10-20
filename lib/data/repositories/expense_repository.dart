@@ -170,6 +170,26 @@ class ExpenseRepository {
     );
   }
 
+  /// Add a single receipt image record to an existing expense.
+  Future<int> addReceiptImage(int expenseId, String fileName) async {
+    final db = await _helper.database;
+    return db.insert('receipt_images', {
+      'expense_id': expenseId,
+      'file_name': fileName,
+    });
+  }
+
+  /// Delete a single receipt image and remove its file from disk.
+  Future<void> deleteReceiptImage(ReceiptImage receipt) async {
+    final db = await _helper.database;
+    await db.delete('receipt_images', where: 'id = ?', whereArgs: [receipt.id]);
+    final path = await receiptFullPath(receipt.fileName);
+    final file = File(path);
+    if (await file.exists()) {
+      await file.delete();
+    }
+  }
+
   /// Delete an expense. Throws if reimbursed.
   /// Also deletes associated receipt files from disk.
   Future<void> deleteExpense(int id) async {

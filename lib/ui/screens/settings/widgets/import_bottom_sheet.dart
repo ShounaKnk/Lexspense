@@ -159,13 +159,13 @@ class _ImportBottomSheetState extends ConsumerState<ImportBottomSheet> {
               ),
               const SizedBox(height: 8),
               _buildColumnChipRow(
-                ['Date *', 'Amount *', 'Category *', 'Case / Matter *'],
+                ['Date *', 'Amount *', 'Category *', 'Compensated *'],
                 isMandatory: true,
                 theme: theme,
               ),
               const SizedBox(height: 6),
               _buildColumnChipRow(
-                ['Court / Forum', 'Compensated', 'Notes'],
+                ['Case / Matter', 'Court / Forum', 'Notes'],
                 isMandatory: false,
                 theme: theme,
               ),
@@ -181,7 +181,7 @@ class _ImportBottomSheetState extends ConsumerState<ImportBottomSheet> {
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      'Compensated items are stored directly into Reimbursement History. Uncompensated items appear on your Dashboard. Missing cases and categories are auto-created.',
+                      'Compensated items (Yes/No) are stored in Reimbursement History. Uncompensated items appear on your Dashboard. Case defaults to "General" if omitted. Notes and Court are optional.',
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontSize: 11,
                         color: theme.colorScheme.onSurfaceVariant,

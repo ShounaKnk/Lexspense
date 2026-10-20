@@ -9,6 +9,7 @@ class ExpenseListTile extends StatelessWidget {
   final bool isSelected;
   final ValueChanged<bool?> onSelected;
   final VoidCallback onTap;
+  final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
   const ExpenseListTile({
@@ -17,6 +18,7 @@ class ExpenseListTile extends StatelessWidget {
     required this.isSelected,
     required this.onSelected,
     required this.onTap,
+    this.onEdit,
     this.onDelete,
   });
 
@@ -115,14 +117,32 @@ class ExpenseListTile extends StatelessWidget {
                       fontSize: 16,
                     ),
                   ),
-                  if (onDelete != null)
-                    IconButton(
-                      icon: const Icon(Icons.delete_outline_rounded, size: 18),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      color: theme.colorScheme.error.withOpacity(0.7),
-                      onPressed: onDelete,
-                      tooltip: 'Delete expense',
+                  const SizedBox(height: 4),
+                  if (onEdit != null || onDelete != null)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (onEdit != null)
+                          IconButton(
+                            icon: const Icon(Icons.edit_outlined, size: 18),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            color: theme.colorScheme.onSurfaceVariant.withOpacity(0.8),
+                            onPressed: onEdit,
+                            tooltip: 'Edit expense',
+                          ),
+                        if (onEdit != null && onDelete != null)
+                          const SizedBox(width: 8),
+                        if (onDelete != null)
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            color: theme.colorScheme.error.withOpacity(0.7),
+                            onPressed: onDelete,
+                            tooltip: 'Delete expense',
+                          ),
+                      ],
                     ),
                 ],
               ),

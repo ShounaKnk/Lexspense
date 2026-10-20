@@ -264,6 +264,13 @@ class DashboardScreen extends ConsumerWidget {
                                 ),
                               );
                             },
+                            onEdit: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => AddExpenseScreen(expenseToEdit: item),
+                                ),
+                              );
+                            },
                             onDelete: () => _deleteExpense(context, ref, item),
                           );
                         },

@@ -5,6 +5,8 @@ import '../../../core/utils/currency_utils.dart';
 import '../../../core/utils/date_utils.dart';
 import '../../../data/models/client_matter.dart';
 import '../../../data/models/expense.dart';
+import '../../../data/models/expense_view.dart';
+import '../../../data/models/receipt_image.dart';
 import '../../../providers/category_provider.dart';
 import '../../../providers/database_provider.dart';
 import '../../../providers/expense_provider.dart';
@@ -19,8 +21,13 @@ import '../../widgets/lexspense_app_bar.dart';
 
 class AddExpenseScreen extends ConsumerStatefulWidget {
   final bool fromWidget;
+  final ExpenseView? expenseToEdit;
 
-  const AddExpenseScreen({super.key, this.fromWidget = false});
+  const AddExpenseScreen({
+    super.key,
+    this.fromWidget = false,
+    this.expenseToEdit,
+  });
 
   @override
   ConsumerState<AddExpenseScreen> createState() => _AddExpenseScreenState();
@@ -34,12 +41,44 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
   int? _selectedCategoryId;
   late DateTime _selectedDate;
   final List<File> _receiptImages = [];
+  List<ReceiptImage> _existingReceipts = [];
+  final List<ReceiptImage> _receiptsToDelete = [];
   bool _isSaving = false;
+
+  bool get _isEditing => widget.expenseToEdit != null;
 
   @override
   void initState() {
     super.initState();
-    _selectedDate = DateTime.now();
+    if (_isEditing) {
+      final exp = widget.expenseToEdit!.expense;
+      final amount = exp.amountPaise / 100.0;
+      _amountController.text = (amount == amount.toInt())
+          ? amount.toInt().toString()
+          : amount.toStringAsFixed(2);
+      _selectedMatterId = exp.matterId;
+      _selectedCategoryId = exp.categoryId;
+      try {
+        _selectedDate = AppDateUtils.fromDbString(exp.expenseDate);
+      } catch (_) {
+        _selectedDate = DateTime.now();
+      }
+      _notesController.text = exp.notes ?? '';
+      _loadExistingReceipts(exp.id!);
+    } else {
+      _selectedDate = DateTime.now();
+    }
+  }
+
+  Future<void> _loadExistingReceipts(int expenseId) async {
+    try {
+      final receipts = await ref.read(expenseRepositoryProvider).getReceiptsForExpense(expenseId);
+      if (mounted) {
+        setState(() {
+          _existingReceipts = receipts;
+        });
+      }
+    } catch (_) {}
   }
 
   @override
@@ -174,43 +213,97 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
 
     try {
       final receiptStorage = ref.read(receiptStorageServiceProvider);
-      final receiptFileNames = <String>[];
-      for (final imageFile in _receiptImages) {
-        final fileName = await receiptStorage.saveReceipt(imageFile);
-        receiptFileNames.add(fileName);
-      }
+      final expenseRepo = ref.read(expenseRepositoryProvider);
 
-      final expense = Expense(
-        matterId: _selectedMatterId!,
-        categoryId: _selectedCategoryId!,
-        amountPaise: paise,
-        expenseDate: AppDateUtils.toDbString(_selectedDate),
-        notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
-      );
+      if (_isEditing) {
+        final existingExpense = widget.expenseToEdit!.expense;
 
-      await ref.read(expenseRepositoryProvider).insertExpense(
-        expense,
-        receiptFileNames: receiptFileNames,
-      );
+        // 1. Delete removed receipts
+        for (final receipt in _receiptsToDelete) {
+          await expenseRepo.deleteReceiptImage(receipt);
+        }
 
-      ref.invalidate(unpaidExpensesProvider);
-      await ref.read(widgetSyncServiceProvider).updateWidgetData();
+        // 2. Add new receipts
+        for (final imageFile in _receiptImages) {
+          final fileName = await receiptStorage.saveReceipt(imageFile);
+          await expenseRepo.addReceiptImage(existingExpense.id!, fileName);
+        }
 
-      if (mounted) {
-        final theme = Theme.of(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Logged ${CurrencyUtils.format(paise)} successfully!',
-              style: TextStyle(
-                color: theme.colorScheme.onPrimary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            backgroundColor: theme.colorScheme.primary,
-          ),
+        // 3. Update expense row
+        final updatedExpense = Expense(
+          id: existingExpense.id,
+          matterId: _selectedMatterId!,
+          categoryId: _selectedCategoryId!,
+          reimbursementId: existingExpense.reimbursementId,
+          amountPaise: paise,
+          expenseDate: AppDateUtils.toDbString(_selectedDate),
+          notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+          createdAt: existingExpense.createdAt,
         );
-        Navigator.of(context).pop();
+
+        await expenseRepo.updateExpense(updatedExpense);
+
+        // 4. Invalidate providers
+        ref.invalidate(unpaidExpensesProvider);
+        ref.invalidate(singleExpenseProvider(existingExpense.id!));
+        ref.invalidate(expenseReceiptsProvider(existingExpense.id!));
+        await ref.read(widgetSyncServiceProvider).updateWidgetData();
+
+        if (mounted) {
+          final theme = Theme.of(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Expense updated successfully!',
+                style: TextStyle(
+                  color: theme.colorScheme.onPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              backgroundColor: theme.colorScheme.primary,
+            ),
+          );
+          Navigator.of(context).pop(true);
+        }
+      } else {
+        final receiptFileNames = <String>[];
+        for (final imageFile in _receiptImages) {
+          final fileName = await receiptStorage.saveReceipt(imageFile);
+          receiptFileNames.add(fileName);
+        }
+
+        final expense = Expense(
+          matterId: _selectedMatterId!,
+          categoryId: _selectedCategoryId!,
+          amountPaise: paise,
+          expenseDate: AppDateUtils.toDbString(_selectedDate),
+          notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+        );
+
+        await expenseRepo.insertExpense(
+          expense,
+          receiptFileNames: receiptFileNames,
+        );
+
+        ref.invalidate(unpaidExpensesProvider);
+        await ref.read(widgetSyncServiceProvider).updateWidgetData();
+
+        if (mounted) {
+          final theme = Theme.of(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Logged ${CurrencyUtils.format(paise)} successfully!',
+                style: TextStyle(
+                  color: theme.colorScheme.onPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              backgroundColor: theme.colorScheme.primary,
+            ),
+          );
+          Navigator.of(context).pop(true);
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -242,9 +335,11 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const PageHeaderTitle(
-                  title: 'Log Expense',
-                  subtitle: 'Record billable case expenditure with receipt',
+                PageHeaderTitle(
+                  title: _isEditing ? 'Edit Expense' : 'Log Expense',
+                  subtitle: _isEditing
+                      ? 'Update billable expenditure (#${widget.expenseToEdit!.expense.id})'
+                      : 'Record billable case expenditure with receipt',
                 ),
                 // 1. Amount
                 Text(
@@ -295,8 +390,8 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
                   loading: () => const LinearProgressIndicator(),
                   error: (e, _) => Text('Error loading categories: $e'),
                   data: (categories) {
-                    // Preselect first if not selected
-                    if (_selectedCategoryId == null && categories.isNotEmpty) {
+                    // Preselect first if not selected and not editing
+                    if (!_isEditing && _selectedCategoryId == null && categories.isNotEmpty) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         if (mounted && _selectedCategoryId == null) {
                           setState(() => _selectedCategoryId = categories.first.id);
@@ -362,11 +457,90 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
                   controller: _notesController,
                   textCapitalization: TextCapitalization.sentences,
                   decoration: InputDecoration(
-                    hintText: 'Enter description',
+                    hintText: 'Enter description (optional)',
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
                   ),
                 ),
                 const SizedBox(height: 24),
+
+                // Existing Receipts (when editing)
+                if (_isEditing && _existingReceipts.isNotEmpty) ...[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'CURRENT RECEIPTS',
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.1,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      Text(
+                        '${_existingReceipts.length} attached',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 90,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _existingReceipts.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 8),
+                      itemBuilder: (context, idx) {
+                        final receipt = _existingReceipts[idx];
+                        return FutureBuilder<File>(
+                          future: ref.read(receiptStorageServiceProvider).getReceiptFile(receipt.fileName),
+                          builder: (context, snapshot) {
+                            return Stack(
+                              children: [
+                                Container(
+                                  width: 90,
+                                  height: 90,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(color: theme.dividerColor, width: 0.8),
+                                    color: isDark ? const Color(0xFF1E1E22) : Colors.grey.shade100,
+                                  ),
+                                  clipBehavior: Clip.antiAlias,
+                                  child: snapshot.hasData
+                                      ? Image.file(snapshot.data!, fit: BoxFit.cover)
+                                      : const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                                ),
+                                Positioned(
+                                  top: 4,
+                                  right: 4,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _receiptsToDelete.add(receipt);
+                                        _existingReceipts.removeAt(idx);
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.black87,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(Icons.close_rounded, size: 14, color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
 
                 // 6. Receipts
                 ReceiptCapture(
@@ -394,9 +568,9 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
                             color: theme.colorScheme.onPrimary,
                           ),
                         )
-                      : const Icon(Icons.save_rounded),
+                      : Icon(_isEditing ? Icons.check_circle_outline_rounded : Icons.save_rounded),
                   label: Text(
-                    _isSaving ? 'Saving...' : 'Save Expense',
+                    _isSaving ? 'Saving...' : (_isEditing ? 'Save Changes' : 'Save Expense'),
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),

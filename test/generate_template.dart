@@ -20,9 +20,9 @@ void main() {
       'Date',
       'Amount',
       'Category',
+      'Compensated',
       'Case',
       'Court',
-      'Compensated',
       'Notes',
     ];
 
@@ -38,9 +38,9 @@ void main() {
       TextCellValue('15/10/2024'),
       DoubleCellValue(250.00),
       TextCellValue('Court Fees'),
+      TextCellValue('No'),
       TextCellValue('State v. Sharma'),
       TextCellValue('High Court of Delhi'),
-      TextCellValue('No'),
       TextCellValue('Certified copy urgent fee'),
     ]);
 
@@ -49,21 +49,21 @@ void main() {
       TextCellValue('16/10/2024'),
       DoubleCellValue(420.00),
       TextCellValue('Travel & Transport'),
+      TextCellValue('Yes'),
       TextCellValue('Mehta v. Union of India'),
       TextCellValue('Supreme Court of India'),
-      TextCellValue('Yes'),
       TextCellValue('Cab to Court 2'),
     ]);
 
-    // Sample Row 3: Printing
+    // Sample Row 3: Printing with optional columns omitted / empty notes
     sheet.appendRow([
       TextCellValue('18/10/2024'),
       DoubleCellValue(180.00),
       TextCellValue('Printing & Stationery'),
-      TextCellValue('State v. Sharma'),
-      TextCellValue('High Court of Delhi'),
       TextCellValue('No'),
-      TextCellValue('Paperbook printouts 60 pages'),
+      TextCellValue('General'),
+      TextCellValue(''),
+      TextCellValue(''),
     ]);
 
     final dir = Directory('assets/templates');
